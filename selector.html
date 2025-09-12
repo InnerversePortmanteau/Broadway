@@ -122,6 +122,15 @@
 
     <div class="container-card">
 
+        <!-- Audio Player Section -->
+        <div class="audio-player-container text-center mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Listen to the Theme Song!</h2>
+            <audio controls class="w-full rounded-lg shadow">
+                <source src="the-broadway-selector.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
         <h1 class="text-4xl font-bold text-center text-gray-900 mb-2">The Broadway Selector</h1>
         <p class="text-center text-gray-600 mb-8">Let's find the perfect show for you tonight!</p>
 
@@ -227,6 +236,7 @@
             <div id="todays-deals-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Show cards will be inserted here by JavaScript -->
             </div>
+            <p id="no-results-message" class="text-center text-gray-500 mt-4 hidden">No shows match your selection. Try a different combination!</p>
         </div>
 
         <!-- Disclaimer Section -->
@@ -248,47 +258,168 @@
 
     </div>
 
-    <!-- Modal for result -->
-    <div id="resultModal" class="modal">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4">Your Selections</h3>
-            <div id="modalContent" class="text-left text-gray-700 mb-6"></div>
-            <button id="closeModalBtn" class="main-button">Got it!</button>
-        </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const findShowBtn = document.getElementById('findShowBtn');
-            const resultModal = document.getElementById('resultModal');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const modalContent = document.getElementById('modalContent');
             const dealsContainer = document.getElementById('todays-deals-container');
+            const noResultsMessage = document.getElementById('no-results-message');
 
-            // Combined and consolidated data from all sources
             const showData = {
-                "& Juliet": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 46, type: "Standard" }, { source: "Playbill", price: 69, type: "Discount" }, { source: "Playbill", price: 45, type: "Standing Room" }, { source: "Playbill", price: 47, type: "General Rush" }], location: "Stephen Sondheim Theatre", description: "A hilarious and heartwarming pop musical that asks, 'What if Juliet didn't end it all?'", image: "and-juliet.jpg" },
-                "Aladdin": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 102, type: "Standard" }, { source: "Playbill", price: 35, type: "Digital Lottery" }], location: "New Amsterdam Theatre", description: "The hit Broadway musical that brings the magic of the Disney classic to life on stage.", image: "aladdin.jpg" },
-                "Art on Broadway": { prices: [{ source: "TodayTix", price: 102, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 49, type: "Digital Lottery" }], location: "Music Box Theatre", description: "A witty and thought-provoking play about friendship and a blank canvas.", image: "art-on-broadway.jpg" },
-                "Buena Vista Social Club": { prices: [{ source: "TodayTix", price: 62, type: "Standard" }], location: "Gerald Schoenfeld Theatre", description: "A musical that transports you to the golden age of Cuban music.", image: "buena-vista-social-club.jpg" },
-                "Cabaret at the Kit Kat Club": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 25, type: "Digital Lottery" }], location: "August Wilson Theatre", description: "A thrilling revival of the classic musical set in 1930s Berlin.", image: "cabaret.jpg" },
-                "Chicago": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 73, type: "Standard" }, { source: "Playbill", price: 74.50, type: "Discount" }, { source: "Playbill", price: 39, type: "Standing Room" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 49, type: "Student Rush" }], location: "Ambassador Theatre", description: "A sensational musical tale of greed, murder, and show business.", image: "chicago.jpg" },
-                "Death Becomes Her": { prices: [{ source: "TodayTix", price: 61, type: "Standard" }], location: "Lunt-Fontanne Theatre", description: "A darkly comedic musical about two rival actresses who will do anything to stay young forever.", image: "death-becomes-her.jpg" },
-                "Hadestown": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 39, type: "Standing Room" }, { source: "Playbill", price: 47.50, type: "Digital Lottery" }], location: "Walter Kerr Theatre", description: "A mythological musical journey to the underworld, blending folk and jazz.", image: "hadestown.jpg" },
-                "Hamilton": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 201, type: "Standard" }, { source: "Playbill", price: 10, type: "Digital Lottery" }], location: "Richard Rodgers Theatre", description: "The revolutionary story of America's Founding Father, Alexander Hamilton, told through a groundbreaking blend of hip-hop, jazz, and R&B.", image: "hamilton.jpg" },
-                "Harry Potter and the Cursed Child": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 70, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 40, type: "Digital Lottery" }], location: "Lyric Theatre", description: "A magical two-part play continuing the story of Harry Potter and his son Albus.", image: "harry-potter.jpg" },
-                "Hell's Kitchen": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 52, type: "Standard" }, { source: "Playbill", price: 39, type: "Digital Lottery" }, { source: "Playbill", price: 39, type: "General Rush" }], location: "Sam S. Shubert Theatre", description: "An energetic new musical about a young girl's life in New York City.", image: "hells-kitchen.jpg" },
-                "Jeff Ross: Take a Banana For the Ride": { times: ["7:30 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 59, type: "Discount" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }], location: "Nederlander Theatre", description: "A live comedy show from the Roastmaster General himself, Jeff Ross.", image: "jeff-ross.jpg" },
-                "Just in Time": { prices: [], location: "Circle in the Square Theatre", description: "A romantic comedy about a couple facing the complexities of modern dating.", image: "just-in-time.jpg" },
-                "Little Shop of Horrors": { prices: [{ source: "TodayTix", price: 55, type: "Standard" }, { source: "Playbill", price: 40, type: "Digital Lottery" }], location: "N/A", description: "A horror-comedy rock musical about a man-eating plant.", image: "little-shop.jpg" },
-                "Mamma Mia!": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 87, type: "Standard" }, { source: "Playbill", price: 49, type: "Digital Lottery" }, { source: "Playbill", price: 45, type: "General Rush" }], location: "Winter Garden Theatre", description: "A feel-good musical featuring the timeless hits of ABBA.", image: "mamma-mia.jpg" },
-                "Maybe Happy Ending": { prices: [{ source: "TodayTix", price: 63, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }], location: "Belasco Theatre", description: "A whimsical new musical about two obsolete robots finding love.", image: "maybe-happy-ending.jpg" },
-                "MJ The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 82, type: "Standard" }, { source: "Playbill", price: 49, type: "Digital Lottery" }], location: "Neil Simon Theatre", description: "A powerful musical celebrating the life and artistry of Michael Jackson.", image: "mj-the-musical.jpg" },
-                "Moulin Rouge! The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 47.50, type: "Digital Lottery" }], location: "Al Hirschfeld Theatre", description: "A spectacular musical mash-up of pop hits and dazzling romance.", image: "moulin-rouge.jpg" },
-                "Oh, Mary!": { prices: [{ source: "Playbill", price: 47, type: "Digital Lottery" }, { source: "Playbill", price: 43, type: "General Rush" }], location: "Lyceum Theatre", description: "A riotous, anachronistic comedy about a young Abraham Lincoln.", image: "oh-mary.jpg" },
-                "Operation Mincemeat": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 63, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }], location: "John Golden Theatre", description: "A hilarious and inventive musical based on a true WWII espionage story.", image: "operation-mincemeat.jpg" },
-                "Punch": { prices: [{ source: "TodayTix", price: 92, type: "Standard" }, { source: "Playbill", price: 74, type: "Discount" }], location: "Samuel J. Friedman Theatre", description: "A new play exploring complex themes of identity and legacy.", image: "punch.jpg" },
-                "SIX: The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 70, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 49, type: "Standing Room" }, { source: "Playbill", price: 35, type: "Student Rush" }], location: "Lena Horne Theatre", description: "The six wives of Henry VIII take the mic to tell their side of the story in this pop musical.", image: "six.jpg" },
-                "Stranger Things: The First Shadow": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 53, type: "Standard" }, { source: "Playbill", price: 79, type: "Discount" }], location: "Marquis Theatre", description: "A stage play that serves as a thrilling prequel to the popular TV series.", image: "stranger-things.jpg" },
-                "The Book of Mormon": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 69, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 53, type: "General Rush" }], location: "Eugene O'Neill Theatre", description: "A satirical musical comedy about two young Mormon missionaries sent to a remote village in Uganda.", image: "the-book-of-mormon.jpg" },
-                "The Great Gatsby": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 52, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }, { source: "Playbill", price: 25
+                "& Juliet": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 46, type: "Standard" }, { source: "Playbill", price: 69, type: "Discount" }, { source: "Playbill", price: 45, type: "Standing Room" }, { source: "Playbill", price: 47, type: "General Rush" }], location: "Stephen Sondheim Theatre", description: "A hilarious and heartwarming pop musical that asks, 'What if Juliet didn't end it all?'", image: "and-juliet.jpg", tags: ["musical", "comedy", "jukebox", "feel-good"] },
+                "Aladdin": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 102, type: "Standard" }, { source: "Playbill", price: 35, type: "Digital Lottery" }], location: "New Amsterdam Theatre", description: "The hit Broadway musical that brings the magic of the Disney classic to life on stage.", image: "aladdin.jpg", tags: ["musical", "family-friendly", "classic-musical", "sing-your-heart-out"] },
+                "Art on Broadway": { prices: [{ source: "TodayTix", price: 102, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 49, type: "Digital Lottery" }], location: "Music Box Theatre", description: "A witty and thought-provoking play about friendship and a blank canvas.", image: "art-on-broadway.jpg", tags: ["play", "mind-bending", "something-different"] },
+                "Buena Vista Social Club": { prices: [{ source: "TodayTix", price: 62, type: "Standard" }], location: "Gerald Schoenfeld Theatre", description: "A musical that transports you to the golden age of Cuban music.", image: "buena-vista-social-club.jpg", tags: ["musical", "jukebox", "sing-your-heart-out", "feel-good"] },
+                "Cabaret at the Kit Kat Club": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 25, type: "Digital Lottery" }], location: "August Wilson Theatre", description: "A thrilling revival of the classic musical set in 1930s Berlin.", image: "cabaret.jpg", tags: ["musical", "classic-musical", "long-running"] },
+                "Chicago": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 73, type: "Standard" }, { source: "Playbill", price: 74.50, type: "Discount" }, { source: "Playbill", price: 39, type: "Standing Room" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 49, type: "Student Rush" }], location: "Ambassador Theatre", description: "A sensational musical tale of greed, murder, and show business.", image: "chicago.jpg", tags: ["musical", "long-running", "classic-musical"] },
+                "Death Becomes Her": { prices: [{ source: "TodayTix", price: 61, type: "Standard" }], location: "Lunt-Fontanne Theatre", description: "A darkly comedic musical about two rival actresses who will do anything to stay young forever.", image: "death-becomes-her.jpg", tags: ["musical", "comedy", "thriller", "mind-bending", "new-edgy"] },
+                "Hadestown": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 39, type: "Standing Room" }, { source: "Playbill", price: 47.50, type: "Digital Lottery" }], location: "Walter Kerr Theatre", description: "A mythological musical journey to the underworld, blending folk and jazz.", image: "hadestown.jpg", tags: ["musical", "long-running", "tony-award", "sing-your-heart-out"] },
+                "Hamilton": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 201, type: "Standard" }, { source: "Playbill", price: 10, type: "Digital Lottery" }], location: "Richard Rodgers Theatre", description: "The revolutionary story of America's Founding Father, Alexander Hamilton, told through a groundbreaking blend of hip-hop, jazz, and R&B.", image: "hamilton.jpg", tags: ["musical", "tony-award", "long-running", "sing-your-heart-out"] },
+                "Harry Potter and the Cursed Child": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 70, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 40, type: "Digital Lottery" }], location: "Lyric Theatre", description: "A magical two-part play continuing the story of Harry Potter and his son Albus.", image: "harry-potter.jpg", tags: ["play", "thriller", "magic", "family-friendly", "something-different", "see-a-star"] },
+                "Hell's Kitchen": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 52, type: "Standard" }, { source: "Playbill", price: 39, type: "Digital Lottery" }, { source: "Playbill", price: 39, type: "General Rush" }], location: "Sam S. Shubert Theatre", description: "An energetic new musical about a young girl's life in New York City.", image: "hells-kitchen.jpg", tags: ["musical", "new-edgy", "sing-your-heart-out"] },
+                "Jeff Ross: Take a Banana For the Ride": { times: ["7:30 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 59, type: "Discount" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }], location: "Nederlander Theatre", description: "A live comedy show from the Roastmaster General himself, Jeff Ross.", image: "jeff-ross.jpg", tags: ["comedy", "laugh-out-loud"] },
+                "Just in Time": { prices: [], location: "Circle in the Square Theatre", description: "A romantic comedy about a couple facing the complexities of modern dating.", image: "just-in-time.jpg", tags: ["play", "comedy", "feel-good"] },
+                "Little Shop of Horrors": { prices: [{ source: "TodayTix", price: 55, type: "Standard" }, { source: "Playbill", price: 40, type: "Digital Lottery" }], location: "N/A", description: "A horror-comedy rock musical about a man-eating plant.", image: "little-shop.jpg", tags: ["musical", "comedy", "thriller", "mind-bending", "something-different"] },
+                "Mamma Mia!": { times: ["8:00 PM"], prices: [{ source: "TodayTix", price: 87, type: "Standard" }, { source: "Playbill", price: 49, type: "Digital Lottery" }, { source: "Playbill", price: 45, type: "General Rush" }], location: "Winter Garden Theatre", description: "A feel-good musical featuring the timeless hits of ABBA.", image: "mamma-mia.jpg", tags: ["musical", "jukebox", "feel-good", "sing-your-heart-out"] },
+                "Maybe Happy Ending": { prices: [{ source: "TodayTix", price: 63, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }], location: "Belasco Theatre", description: "A whimsical new musical about two obsolete robots finding love.", image: "maybe-happy-ending.jpg", tags: ["musical", "new-edgy", "something-different"] },
+                "MJ The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 82, type: "Standard" }, { source: "Playbill", price: 49, type: "Digital Lottery" }], location: "Neil Simon Theatre", description: "A powerful musical celebrating the life and artistry of Michael Jackson.", image: "mj-the-musical.jpg", tags: ["musical", "jukebox", "sing-your-heart-out"] },
+                "Moulin Rouge! The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 62, type: "Standard" }, { source: "Playbill", price: 47.50, type: "Digital Lottery" }], location: "Al Hirschfeld Theatre", description: "A spectacular musical mash-up of pop hits and dazzling romance.", image: "moulin-rouge.jpg", tags: ["musical", "jukebox", "feel-good", "sing-your-heart-out"] },
+                "Oh, Mary!": { prices: [{ source: "Playbill", price: 47, type: "Digital Lottery" }, { source: "Playbill", price: 43, type: "General Rush" }], location: "Lyceum Theatre", description: "A riotous, anachronistic comedy about a young Abraham Lincoln.", image: "oh-mary.jpg", tags: ["play", "comedy", "new-edgy", "something-different", "laugh-out-loud"] },
+                "Operation Mincemeat": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 63, type: "Standard" }, { source: "Playbill", price: 49, type: "General Rush" }], location: "John Golden Theatre", description: "A hilarious and inventive musical based on a true WWII espionage story.", image: "operation-mincemeat.jpg", tags: ["musical", "comedy", "new-edgy", "something-different", "laugh-out-loud"] },
+                "Punch": { prices: [{ source: "TodayTix", price: 92, type: "Standard" }, { source: "Playbill", price: 74, type: "Discount" }], location: "Samuel J. Friedman Theatre", description: "A new play exploring complex themes of identity and legacy.", image: "punch.jpg", tags: ["play", "mind-bending", "new-edgy"] },
+                "SIX: The Musical": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 70, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 49, type: "Standing Room" }, { source: "Playbill", price: 35, type: "Student Rush" }], location: "Lena Horne Theatre", description: "The six wives of Henry VIII take the mic to tell their side of the story in this pop musical.", image: "six.jpg", tags: ["musical", "jukebox", "feel-good", "sing-your-heart-out"] },
+                "Stranger Things: The First Shadow": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 53, type: "Standard" }, { source: "Playbill", price: 79, type: "Discount" }], location: "Marquis Theatre", description: "A stage play that serves as a thrilling prequel to the popular TV series.", image: "stranger-things.jpg", tags: ["play", "thriller", "mind-bending", "something-different"] },
+                "The Book of Mormon": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 69, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 53, type: "General Rush" }], location: "Eugene O'Neill Theatre", description: "A satirical musical comedy about two young Mormon missionaries sent to a remote village in Uganda.", image: "the-book-of-mormon.jpg", tags: ["musical", "comedy", "long-running", "laugh-out-loud"] },
+                "The Great Gatsby": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 52, type: "Standard" }, { source: "Playbill", price: 45, type: "Digital Lottery" }, { source: "Playbill", price: 40, type: "General Rush" }, { source: "Playbill", price: 25, type: "Student Rush" }], location: "Broadway Theatre", description: "A new musical adaptation of the classic American novel about love, wealth, and longing.", image: "the-great-gatsby.jpg", tags: ["musical", "new-edgy", "sing-your-heart-out"] },
+                "The Lion King": { prices: [{ source: "TodayTix", price: 102, type: "Standard" }, { source: "Playbill", price: 35, type: "Digital Lottery" }], location: "Minskoff Theatre", description: "A dazzling and visually stunning musical based on the Disney film.", image: "the-lion-king.jpg", tags: ["musical", "family-friendly", "classic-musical", "long-running"] },
+                "The Outsiders": { times: ["7:00 PM"], prices: [{ source: "TodayTix", price: 87, type: "Standard" }, { source: "Playbill", price: 49, type: "Digital Lottery" }, { source: "Playbill", price: 45, type: "General Rush" }, { source: "Playbill", price: 30, type: "Student Rush" }], location: "Bernard B. Jacobs Theatre", description: "A new musical bringing the beloved coming-of-age story to the stage.", image: "the-outsiders.jpg", tags: ["musical", "new-edgy"] },
+                "Wicked": { prices: [{ source: "TodayTix", price: 112, type: "Standard" }, { source: "Playbill", price: 60, type: "Digital Lottery" }, { source: "Playbill", price: 39, type: "Student Rush" }], location: "Gershwin Theatre", description: "A magical retelling of the Land of Oz from the perspective of its notorious witches.", image: "wicked.jpg", tags: ["musical", "classic-musical", "long-running", "sing-your-heart-out"] },
+                "Rob Lake Magic with Special Guests The Muppets": { prices: [{ source: "TodayTix", price: 67, type: "Standard" }], location: "N/A", description: "A family-friendly magic show with a star-studded cast of puppets.", image: "rob-lake-magic.jpg", tags: ["magic", "family-friendly", "something-different"] },
+                "Heathers The Musical": { prices: [{ source: "TodayTix", price: 59, type: "Standard" }], location: "N/A", description: "A cult classic musical comedy based on the 1980s film.", image: "heathers.jpg", tags: ["musical", "comedy", "new-edgy"] },
+                "Prince F*ggot": { prices: [{ source: "TodayTix", price: 120, type: "Standard" }], location: "N/A", description: "An edgy and provocative new play.", image: "prince-faggot.jpg", tags: ["play", "new-edgy"] },
+                "Ginger Twinsies": { prices: [{ source: "TodayTix", price: 49, type: "Standard" }], location: "N/A", description: "A hilarious twin comedy act.", image: "ginger-twinsies.jpg", tags: ["comedy", "laugh-out-loud"] },
+                "AMAZE Magic": { prices: [{ source: "TodayTix", price: 58, type: "Standard" }], location: "N/A", description: "A mind-bending magic and illusion show.", image: "amaze-magic.jpg", tags: ["magic", "mind-bending", "something-different"] },
+                "Color Theories by Julio Torres": { prices: [{ source: "TodayTix", price: 97, type: "Standard" }], location: "N/A", description: "A surreal and hilarious comedy special.", image: "color-theories.jpg", tags: ["comedy", "experimental", "mind-bending", "laugh-out-loud"] },
+                "Queen of Hearts by Company XIV": { prices: [{ source: "TodayTix", price: 35, type: "Standard" }], location: "N/A", description: "A decadent and visually stunning burlesque show.", image: "queen-of-hearts.jpg", tags: ["experimental", "new-edgy", "something-different"] },
+                "Pen Pals": { prices: [{ source: "TodayTix", price: 65, type: "Standard" }, { source: "Playbill", price: 66, type: "Discount" }], location: "N/A", description: "A touching and funny play about friendship.", image: "pen-pals.jpg", tags: ["play", "feel-good"] },
+                "The Play That Goes Wrong": { prices: [{ source: "TodayTix", price: 82, type: "Standard" }], location: "N/A", description: "A hilarious farce about a disastrous murder mystery play.", image: "play-that-goes-wrong.jpg", tags: ["play", "comedy", "laugh-out-loud"] },
+                "The Other Americans": { prices: [{ source: "TodayTix", price: 120, type: "Standard" }], location: "N/A", description: "A new drama about the immigrant experience.", image: "the-other-americans.jpg", tags: ["play", "new-edgy"] },
+                "Monkey Off My Back or The Cat’s Meow": { prices: [{ source: "TodayTix", price: 59, type: "Standard" }], location: "N/A", description: "An experimental new play with a surrealist twist.", image: "monkey-off-my-back.jpg", tags: ["play", "experimental", "something-different"] },
+                "House of McQueen": { prices: [{ source: "TodayTix", price: 58, type: "Standard" }], location: "N/A", description: "A biographical play about fashion designer Alexander McQueen.", image: "house-of-mcqueen.jpg", tags: ["play", "new-edgy"] },
+                "Mexodus": { prices: [{ source: "TodayTix", price: 60, type: "Standard" }], location: "N/A", description: "A powerful new musical exploring the stories of migration.", image: "mexodus.jpg", tags: ["musical", "new-edgy", "something-different"] },
+                "Drunk Romeo & Juliet": { prices: [{ source: "TodayTix", price: 37, type: "Standard" }], location: "N/A", description: "A boisterous, improvised take on the classic Shakespeare play.", image: "drunk-romeo-and-juliet.jpg", tags: ["play", "comedy", "new-edgy", "laugh-out-loud"] },
+                "Ava: The Secret Conversations": { prices: [{ source: "TodayTix", price: 72, type: "Standard" }], location: "N/A", description: "A revealing play about the life of Hollywood legend Ava Gardner.", image: "ava.jpg", tags: ["play", "classic-broadway"] },
+                "Perfect Crime": { prices: [{ source: "TodayTix", price: 33, type: "Standard" }], location: "N/A", description: "A classic whodunit murder mystery that will keep you guessing.", image: "perfect-crime.jpg", tags: ["thriller", "mind-bending"] },
+                "Exorcistic: The Rock Musical": { prices: [{ source: "TodayTix", price: 41, type: "Standard" }], location: "N/A", description: "A parody of the horror film, set to rock music.", image: "exorcistic.jpg", tags: ["musical", "comedy", "new-edgy", "something-different"] },
+                "Friends The Musical Parody": { prices: [{ source: "TodayTix", price: 33, type: "Standard" }], location: "N/A", description: "A hilarious and loving tribute to the beloved TV sitcom.", image: "friends.jpg", tags: ["musical", "comedy", "jukebox", "feel-good", "laugh-out-loud"] },
+                "This is Government": { prices: [{ source: "TodayTix", price: 38, type: "Standard" }], location: "N/A", description: "A thought-provoking play about modern bureaucracy.", image: "this-is-government.jpg", tags: ["play", "new-edgy"] },
+                "Cocktail Magique by Company XIV": { prices: [{ source: "TodayTix", price: 40, type: "Standard" }], location: "N/A", description: "A lavish, theatrical cocktail experience with magic and burlesque.", image: "cocktail-magique.jpg", tags: ["magic", "experimental", "new-edgy", "something-different"] },
+                "Sober Songs": { prices: [{ source: "TodayTix", price: 47, type: "Standard" }], location: "N/A", description: "A moving one-man show about a musician's journey to sobriety.", image: "sober-songs.jpg", tags: ["play", "new-edgy", "something-different"] },
+                "New York Comedy Club (Upper West Side)": { prices: [{ source: "TodayTix", price: 33, type: "Standard" }], location: "N/A", description: "A night of stand-up comedy at a classic NYC club.", image: "nyc-comedy-club-uws.jpg", tags: ["comedy", "laugh-out-loud"] },
+                "Gazillion Bubble Show": { prices: [{ source: "TodayTix", price: 53, type: "Standard" }, { source: "Playbill", price: 49, type: "Discount" }], location: "N/A", description: "A captivating spectacle of light, lasers, and bubbles for the whole family.", image: "gazillion-bubble-show.jpg", tags: ["family-friendly", "magic", "something-different"] },
+                "Chamber Magic": { prices: [{ source: "TodayTix", price: 108, type: "Standard" }], location: "N/A", description: "An elegant and intimate magic show in a close-up setting.", image: "chamber-magic.jpg", tags: ["magic", "mind-bending", "something-different"] },
+                "New York Comedy Club (Midtown)": { prices: [{ source: "TodayTix", price: 27, type: "Standard" }], location: "N/A", description: "A night of stand-up comedy at a classic NYC club.", image: "nyc-comedy-club-midtown.jpg", tags: ["comedy", "laugh-out-loud"] },
+                "The Office! A Musical Parody": { prices: [{ source: "TodayTix", price: 33, type: "Standard" }], location: "N/A", description: "A musical parody of the beloved TV comedy series.", image: "the-office.jpg", tags: ["musical", "comedy", "laugh-out-loud"] },
+                "New York Comedy Club (East Village)": { prices: [{ source: "TodayTix", price: 17, type: "Standard" }], location: "N/A", description: "A night of stand-up comedy at a classic NYC club.", image: "nyc-comedy-club-ev.jpg", tags: ["comedy", "laugh-out-loud"] },
+                "The Infinite Wrench": { prices: [{ source: "TodayTix", price: 20, type: "Standard" }], location: "N/A", description: "A chaotic, hilarious, and fast-paced performance of short plays.", image: "infinite-wrench.jpg", tags: ["experimental", "new-edgy", "something-different"] },
+                "Galas": { prices: [{ source: "TodayTix", price: null, type: "Standard" }], location: "N/A", description: "Special one-night-only performances and events.", image: "galas.jpg", tags: ["classic-broadway", "something-different"] },
+                "This is Not a Drill": { prices: [{ source: "TodayTix", price: 33, type: "Standard" }], location: "N/A", description: "A high-energy, immersive theatrical experience.", image: "this-is-not-a-drill.jpg", tags: ["experimental", "new-edgy", "something-different"] },
+                "Cracked Open": { prices: [{ source: "Playbill", price: 39, type: "Discount" }], location: "N/A", description: "An emotional and raw new play.", image: "cracked-open.jpg", tags: ["play", "new-edgy"] },
+                "Sleepy Hollow the Musical": { prices: [{ source: "Playbill", price: 34, type: "Discount" }], location: "N/A", description: "A musical adaptation of the classic American ghost story.", image: "sleepy-hollow.jpg", tags: ["musical", "thriller", "something-different"] },
+                "The Divine Dating Game": { prices: [{ source: "Playbill", price: 42, type: "Discount" }], location: "N/A", description: "A comedic and interactive show about finding love.", image: "divine-dating-game.jpg", tags: ["comedy", "experimental", "new-edgy", "laugh-out-loud"] },
+                "ApocaLIPSTICK": { prices: [{ source: "Playbill", price: 42, type: "Discount" }], location: "N/A", description: "A drag and comedy show about the end of the world.", image: "apocalipstick.jpg", tags: ["comedy", "experimental", "new-edgy", "laugh-out-loud"] },
+                "Queens": { prices: [{ source: "Playbill", price: 59, type: "Discount" }], location: "N/A", description: "A new play about women navigating life and power.", image: "queens.jpg", tags: ["play", "new-edgy"] },
+                "From Trinity to Trinity": { prices: [{ source: "Playbill", price: 24.89, type: "Discount" }], location: "N/A", description: "An experimental theatre piece.", image: "from-trinity-to-trinity.jpg", tags: ["experimental", "new-edgy", "something-different"] },
+                "Katsura Sunshine’s Rakugo": { prices: [{ source: "Playbill", price: 29, type: "Discount" }], location: "N/A", description: "A solo show of traditional Japanese comedic storytelling.", image: "katsura-sunshine.jpg", tags: ["comedy", "something-different", "laugh-out-loud"] },
+                "59E59 Theaters": { prices: [{ source: "Playbill", price: 27, type: "Discount" }], location: "N/A", description: "A collective discount for shows at the off-Broadway theater.", image: "59e59-theaters.jpg", tags: ["play", "new-edgy", "something-different"] },
+                "Waiting For Godot": { prices: [{ source: "Playbill", price: 49, type: "General Rush" }, { source: "Playbill", price: 49, type: "Digital Lottery" }], location: "N/A", description: "A classic existentialist play.", image: "waiting-for-godot.jpg", tags: ["play", "mind-bending", "classic-broadway"] }
+            };
+
+            function renderDeals(filteredShows = showData) {
+                dealsContainer.innerHTML = '';
+                const showTitles = Object.keys(filteredShows);
+
+                if (showTitles.length === 0) {
+                    noResultsMessage.classList.remove('hidden');
+                    return;
+                } else {
+                    noResultsMessage.classList.add('hidden');
+                }
+
+                showTitles.forEach(title => {
+                    const show = filteredShows[title];
+                    const allOffers = show.prices;
+                    
+                    let lowestPrice = Infinity;
+                    let lowestOfferType = "N/A";
+                    let lowestSource = "N/A";
+
+                    allOffers.forEach(offer => {
+                        const numericPrice = parseFloat(String(offer.price).replace(/[^0-9.]/g, ''));
+                        if (!isNaN(numericPrice) && numericPrice < lowestPrice) {
+                            lowestPrice = numericPrice;
+                            lowestOfferType = offer.type;
+                            lowestSource = offer.source;
+                        }
+                    });
+                    
+                    const priceDisplay = lowestPrice === Infinity ? 'N/A' : `$${lowestPrice}`;
+
+                    const showCard = document.createElement('div');
+                    showCard.className = "bg-white p-4 rounded-lg shadow-sm border border-gray-100 transition transform hover:scale-105";
+                    
+                    showCard.innerHTML = `
+                        <img src="${show.image || 'https://placehold.co/400x250?text=No+Image'}" alt="${title}" class="rounded-lg mb-4 w-full h-40 object-cover">
+                        <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
+                        <p class="text-sm text-gray-500 mt-2">${show.description || 'No description available.'}</p>
+                        ${show.times && show.times.length > 0 ? `<p class="text-sm text-gray-700 mt-2"><strong>Showtime:</strong> ${show.times.join(', ')}</p>` : ''}
+                        <div class="flex items-baseline mt-2 mb-1">
+                            <span class="text-2xl font-bold text-purple-600">${priceDisplay}</span>
+                            ${lowestSource !== "N/A" ? `<span class="text-sm text-gray-500 ml-2">from ${lowestSource}</span>` : ''}
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2"><strong>Location:</strong> ${show.location || 'N/A'}</p>
+                        ${lowestOfferType !== "N/A" ? `<p class="text-xs text-gray-500 mt-1">Offer: ${lowestOfferType}</p>` : ''}
+                        <a href="https://www.google.com/search?q=${encodeURIComponent(title + ' Broadway show details')}" target="_blank" class="block w-full text-center mt-4 px-4 py-2 text-sm font-semibold rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition">Search for Details</a>
+                    `;
+                    dealsContainer.appendChild(showCard);
+                });
+            }
+
+            findShowBtn.addEventListener('click', () => {
+                const selectedMoods = Array.from(document.querySelectorAll('input[name="mood"]:checked')).map(checkbox => checkbox.value);
+                const selectedBudget = document.querySelector('input[name="budget"]:checked').value;
+                const selectedVibes = Array.from(document.querySelectorAll('input[name="vibe"]:checked')).map(checkbox => checkbox.value);
+
+                const filteredShows = {};
+
+                Object.keys(showData).forEach(title => {
+                    const show = showData[title];
+                    const showTags = show.tags;
+
+                    const matchesMood = selectedMoods.length === 0 || selectedMoods.some(mood => showTags.includes(mood));
+                    const matchesVibe = selectedVibes.length === 0 || selectedVibes.some(vibe => showTags.includes(vibe));
+
+                    let matchesBudget = true;
+                    if (selectedBudget === "deals") {
+                        const lowestPrice = show.prices.reduce((min, p) => Math.min(min, p.price || Infinity), Infinity);
+                        matchesBudget = lowestPrice <= 50; 
+                    } else if (selectedBudget === "splurge") {
+                        const lowestPrice = show.prices.reduce((min, p) => Math.min(min, p.price || Infinity), Infinity);
+                        matchesBudget = lowestPrice > 100 && lowestPrice !== Infinity; 
+                    } else if (selectedBudget === "no-biggie") {
+                        matchesBudget = true;
+                    }
+
+                    if (matchesMood && matchesVibe && matchesBudget) {
+                        filteredShows[title] = show;
+                    }
+                });
+
+                renderDeals(filteredShows);
+            });
+
+            // Initial render of all deals
+            renderDeals();
+        });
+    </script>
+</body>
+</html>
