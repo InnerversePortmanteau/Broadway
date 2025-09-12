@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Movie Quest: A Collaborative Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1024px;
+        }
+        .quadrant {
+            @apply p-6 rounded-3xl shadow-xl transition-all duration-300 ease-in-out cursor-pointer;
+            @apply border border-slate-700 hover:border-slate-500;
+        }
+        .quadrant-header {
+            @apply flex items-center justify-between mb-4;
+        }
+        .quadrant-title-group {
+            @apply flex items-center space-x-4;
+        }
+        .quadrant-icon {
+            @apply text-4xl;
+        }
+        .quadrant-details {
+            @apply max-h-0 overflow-hidden transition-all duration-500 ease-in-out;
+        }
+        .quadrant-details.expanded {
+            @apply max-h-[2000px];
+        }
+        .progress-bar {
+            @apply w-full h-4 bg-slate-600 rounded-full overflow-hidden;
+        }
+        .progress-fill {
+            @apply h-full bg-gradient-to-r from-teal-400 to-green-500 transition-all duration-500 ease-in-out;
+        }
+        .movie-card {
+            @apply bg-slate-800 p-4 rounded-xl flex flex-col space-y-2;
+        }
+        .movie-card h3 {
+            @apply font-bold text-lg text-white;
+        }
+        .movie-card p {
+            @apply text-sm text-slate-400;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+<div class="container mx-auto">
+    <header class="text-center py-12">
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Our Movie Quest</h1>
+        <p class="mt-4 text-xl text-slate-400">A collaborative framework for our shared journey to cinema victory.</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Quadrant 1: Known Knowns (The Movie Goal) -->
+        <div class="quadrant known-knowns bg-slate-800" onclick="toggleDetails(this)">
+            <div class="quadrant-header">
+                <div class="quadrant-title-group">
+                    <span class="quadrant-icon">🎬</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Known Knowns</h2>
+                        <p class="text-sm text-slate-400">The AMC Stubs Goal</p>
+                    </div>
+                </div>
+                <button class="px-4 py-2 text-xl font-bold text-white bg-slate-700 rounded-full transition-transform duration-300 hover:scale-110">+</button>
+            </div>
+            <div class="quadrant-details">
+                <p class="mb-4 text-slate-300">
+                    This is our foundation. We know the rules and the rewards. Our goal is clear: to watch the movies and unlock the perks.
+                </p>
+                
+                <div class="bg-slate-900 p-4 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-sm">Movies Watched: <span id="movies-watched">0</span>/5</span>
+                        <span id="rewards-status" class="text-sm font-bold text-amber-300"></span>
+                    </div>
+                    <div class="progress-bar mt-2">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-4">
+                    <div class="movie-card" data-movie="Downton Abbey: The Grand Finale">
+                        <h3>Downton Abbey: The Grand Finale</h3>
+                        <p>The cinematic return of the global phenomenon follows the Crawley family and their staff as they enter the 1930s.</p>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                    </div>
+                    <div class="movie-card" data-movie="Anemone">
+                        <h3>Anemone</h3>
+                        <p>A drama about a woman who forms a deep connection with an octopus while diving.</p>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                    </div>
+                    <div class="movie-card" data-movie="Bugonia">
+                        <h3>Bugonia</h3>
+                        <p>A South Korean fantasy thriller about a TV producer who discovers a conspiracy involving people who gain immortality through insects.</p>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                    </div>
+                    <div class="movie-card" data-movie="Hamnet">
+                        <h3>Hamnet</h3>
+                        <p>A historical drama exploring the life of William Shakespeare's son, based on the novel of the same name.</p>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                    </div>
+                    <div class="movie-card" data-movie="Song Sung Blue">
+                        <h3>Song Sung Blue</h3>
+                        <p>A documentary about a group of elderly musicians who find joy and purpose in performing together.</p>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quadrant 2: Known Unknowns (The Planning) -->
+        <div class="quadrant known-unknowns bg-slate-800" onclick="toggleDetails(this)">
+            <div class="quadrant-header">
+                <div class="quadrant-title-group">
+                    <span class="quadrant-icon">📝</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Known Unknowns</h2>
+                        <p class="text-sm text-slate-400">The Planning & Research</p>
+                    </div>
+                </div>
+                <button class="px-4 py-2 text-xl font-bold text-white bg-slate-700 rounded-full transition-transform duration-300 hover:scale-110">+</button>
+            </div>
+            <div class="quadrant-details">
+                <p class="mb-4 text-slate-300">
+                    These are the gaps in our knowledge that we can fill with a little planning. Let's ask some questions to convert these unknowns into our foundation.
+                </p>
+                <div class="bg-slate-900 p-4 rounded-xl space-y-4">
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <p class="text-sm text-slate-300 font-semibold mb-2">Phase 1: Information Overload</p>
+                        <ul class="text-slate-400 text-sm list-disc list-inside">
+                            <li>Which movie are we most excited to see first?</li>
+                            <li>What if we weren't spending so much time on showtimes and could just focus on popcorn?</li>
+                            <li>What's the real cost of our time spent on this decision?</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <p class="text-sm text-slate-300 font-semibold mb-2">Phase 2: Creative Productivity</p>
+                        <ul class="text-slate-400 text-sm list-disc list-inside">
+                            <li>Are we confident that we're in full control of our movie nights, and not just dependent on a third party's business model?</li>
+                            <li>How would it feel to have a data-backed case for our movie night, so we can stop guessing?</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quadrant 3: Unknown Knowns (The Shared Wisdom) -->
+        <div class="quadrant unknown-knowns bg-slate-800" onclick="toggleDetails(this)">
+            <div class="quadrant-header">
+                <div class="quadrant-title-group">
+                    <span class="quadrant-icon">🤝</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Unknown Knowns</h2>
+                        <p class="text-sm text-slate-400">Our Shared Relational World</p>
+                    </div>
+                </div>
+                <button class="px-4 py-2 text-xl font-bold text-white bg-slate-700 rounded-full transition-transform duration-300 hover:scale-110">+</button>
+            </div>
+            <div class="quadrant-details">
+                <p class="mb-4 text-slate-300">
+                    Drawing from the wisdom of "The Untouchables," this is about finding power and safety not in individual strength, but in our shared loyalty and trust. Our combined tastes, hunches, and preferences are our hidden wisdom.
+                </p>
+                <div class="bg-slate-900 p-4 rounded-xl">
+                    <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment"</h4>
+                    <p class="text-sm text-slate-400">
+                        Just like Eliot Ness found strength in his team, our movie quest is a shared endeavor. It's in the discussions on the car ride home, the shared laughter in the theater, and the agreement on the next movie that we discover our true collaborative power. This is the tacit knowledge that makes the whole process enjoyable.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quadrant 4: Unknown Unknowns (The Black Swans) -->
+        <div class="quadrant unknown-unknowns bg-slate-800" onclick="toggleDetails(this)">
+            <div class="quadrant-header">
+                <div class="quadrant-title-group">
+                    <span class="quadrant-icon">🎲</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Unknown Unknowns</h2>
+                        <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
+                    </div>
+                </div>
+                <button class="px-4 py-2 text-xl font-bold text-white bg-slate-700 rounded-full transition-transform duration-300 hover:scale-110">+</button>
+            </div>
+            <div class="quadrant-details">
+                <p class="mb-4 text-slate-300">
+                    These are the unpredictable "black swan" events that could derail our plans. Maybe the movie is sold out, or traffic is a mess. Our resilience is key here.
+                </p>
+                <div class="bg-slate-900 p-4 rounded-xl text-center">
+                    <h4 class="font-semibold text-slate-300 mb-4">Social Entropy Simulator</h4>
+                    <p class="text-sm text-slate-400 mb-4">Click to see how our combined resilience handles an unexpected challenge.</p>
+                    <button id="crisis-button" class="px-6 py-3 font-semibold text-white bg-red-600 rounded-full shadow-lg hover:bg-red-700 transition-colors duration-300">Trigger a Scheduling Crisis!</button>
+                    <div id="crisis-result" class="mt-4 p-3 rounded-lg text-sm bg-red-900/30 border border-red-800 hidden"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let moviesWatched = 0;
+    const totalMovies = 5;
+    const movieData = JSON.parse(localStorage.getItem('movieData')) || {};
+
+    const progressFill = document.getElementById('progress-fill');
+    const moviesWatchedSpan = document.getElementById('movies-watched');
+    const rewardsStatus = document.getElementById('rewards-status');
+    const crisisButton = document.getElementById('crisis-button');
+    const crisisResult = document.getElementById('crisis-result');
+
+    function updateProgress() {
+        let count = 0;
+        document.querySelectorAll('.movie-card').forEach(card => {
+            const movie = card.dataset.movie;
+            if (movieData[movie]) {
+                count++;
+                card.classList.add('opacity-50');
+                card.querySelector('button').disabled = true;
+                card.querySelector('button').textContent = "Watched";
+            }
+        });
+        moviesWatched = count;
+        moviesWatchedSpan.textContent = moviesWatched;
+        const percentage = (moviesWatched / totalMovies) * 100;
+        progressFill.style.width = percentage + '%';
+
+        if (moviesWatched >= 3) {
+            rewardsStatus.textContent = '🎉 $50 Gift Card Earned! 🎉';
+            rewardsStatus.classList.add('text-green-400');
+        } else if (moviesWatched >= 2) {
+            rewardsStatus.textContent = '👏 $15 Gift Card Earned! 👏';
+            rewardsStatus.classList.add('text-green-400');
+        }
+    }
+
+    function trackMovie(button) {
+        const card = button.closest('.movie-card');
+        const movie = card.dataset.movie;
+        if (!movieData[movie]) {
+            movieData[movie] = true;
+            localStorage.setItem('movieData', JSON.stringify(movieData));
+            updateProgress();
+        }
+    }
+
+    function toggleDetails(quadrant) {
+        const details = quadrant.querySelector('.quadrant-details');
+        const button = quadrant.querySelector('.px-4');
+        const isExpanded = details.classList.toggle('expanded');
+        button.textContent = isExpanded ? '−' : '+';
+    }
+
+    crisisButton.addEventListener('click', () => {
+        const crises = [
+            "Unexpected traffic! Looks like we'll be late for the showtime.",
+            "The movie is sold out! Time for Plan B.",
+            "We can't agree on which movie to see next!",
+            "The popcorn machine is broken... the humanity!"
+        ];
+        const crisis = crises[Math.floor(Math.random() * crises.length)];
+        crisisResult.textContent = `CRISIS: ${crisis}`;
+        crisisResult.classList.remove('hidden');
+
+        setTimeout(() => {
+            crisisResult.innerHTML += `<br><br><strong>Relational Solution:</strong> We have a choice: give in to the challenge, or use it as an opportunity for collaboration. Let's find a new showtime, compromise on a different movie, or just grab dinner instead and try again tomorrow. Our shared goal is to enjoy time together, not just to watch a movie.`;
+        }, 1500);
+    });
+
+    // Initialize the page on load
+    updateProgress();
+    document.querySelector('.known-knowns .px-4').click();
+
+</script>
+</body>
+</html>
+
