@@ -72,7 +72,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         <!-- Quadrant 1: Known Knowns (The Movie Goal) -->
-        <div class="quadrant known-knowns bg-slate-800" onclick="toggleDetails(this)">
+        <div class="quadrant known-knowns bg-slate-800" onclick="window.toggleDetails(this)">
             <div class="quadrant-header">
                 <div class="quadrant-title-group">
                     <span class="quadrant-icon">🎬</span>
@@ -102,34 +102,34 @@
                     <div class="movie-card" data-movie="Downton Abbey: The Grand Finale">
                         <h3>Downton Abbey: The Grand Finale</h3>
                         <img src="https://placehold.co/600x400/333/fff?text=Downton_Abbey_The_Grand_Finale.jpg" alt="Generated image for Downton Abbey: The Grand Finale" class="w-full h-auto rounded-lg mt-2">
-                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="window.trackMovie(this)">Mark as Watched</button>
                     </div>
                     <div class="movie-card" data-movie="Anemone">
                         <h3>Anemone</h3>
                         <img src="https://placehold.co/600x400/333/fff?text=Anemone.jpg" alt="Generated image for Anemone" class="w-full h-auto rounded-lg mt-2">
-                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="window.trackMovie(this)">Mark as Watched</button>
                     </div>
                     <div class="movie-card" data-movie="Bugonia">
                         <h3>Bugonia</h3>
                         <img src="https://placehold.co/600x400/333/fff?text=Bugonia.jpg" alt="Generated image for Bugonia" class="w-full h-auto rounded-lg mt-2">
-                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="window.trackMovie(this)">Mark as Watched</button>
                     </div>
                     <div class="movie-card" data-movie="Hamnet">
                         <h3>Hamnet</h3>
                         <img src="https://placehold.co/600x400/333/fff?text=Hamnet.jpg" alt="Generated image for Hamnet" class="w-full h-auto rounded-lg mt-2">
-                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="window.trackMovie(this)">Mark as Watched</button>
                     </div>
                     <div class="movie-card" data-movie="Song Sung Blue">
                         <h3>Song Sung Blue</h3>
                         <img src="https://placehold.co/600x400/333/fff?text=Song_Sung_Blue.jpg" alt="Generated image for Song Sung Blue" class="w-full h-auto rounded-lg mt-2">
-                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="trackMovie(this)">Mark as Watched</button>
+                        <button class="w-full px-4 py-2 mt-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-300" onclick="window.trackMovie(this)">Mark as Watched</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quadrant 2: Known Unknowns (The Planning) -->
-        <div class="quadrant known-unknowns bg-slate-800" onclick="toggleDetails(this)">
+        <div class="quadrant known-unknowns bg-slate-800" onclick="window.toggleDetails(this)">
             <div class="quadrant-header">
                 <div class="quadrant-title-group">
                     <span class="quadrant-icon">📝</span>
@@ -165,7 +165,7 @@
         </div>
 
         <!-- Quadrant 3: Unknown Knowns (The Shared Wisdom) -->
-        <div class="quadrant unknown-knowns bg-slate-800" onclick="toggleDetails(this)">
+        <div class="quadrant unknown-knowns bg-slate-800" onclick="window.toggleDetails(this)">
             <div class="quadrant-header">
                 <div class="quadrant-title-group">
                     <span class="quadrant-icon">🤝</span>
@@ -190,7 +190,7 @@
         </div>
         
         <!-- Quadrant 4: Unknown Unknowns (The Black Swans) -->
-        <div class="quadrant unknown-unknowns bg-slate-800" onclick="toggleDetails(this)">
+        <div class="quadrant unknown-unknowns bg-slate-800" onclick="window.toggleDetails(this)">
             <div class="quadrant-header">
                 <div class="quadrant-title-group">
                     <span class="quadrant-icon">🎲</span>
@@ -223,13 +223,15 @@
     let moviesWatched = 0;
     const totalMovies = 5;
     const movieData = JSON.parse(localStorage.getItem('movieData')) || {};
+
     const progressFill = document.getElementById('progress-fill');
     const moviesWatchedSpan = document.getElementById('movies-watched');
     const rewardsStatus = document.getElementById('rewards-status');
     const crisisButton = document.getElementById('crisis-button');
     const crisisResult = document.getElementById('crisis-result');
 
-    function updateProgress() {
+    // Attach functions to the window object to make them globally accessible
+    window.updateProgress = function() {
         let count = 0;
         document.querySelectorAll('.movie-card').forEach(card => {
             const movie = card.dataset.movie;
@@ -252,24 +254,24 @@
             rewardsStatus.textContent = '👏 $15 Gift Card Earned! 👏';
             rewardsStatus.classList.add('text-green-400');
         }
-    }
+    };
 
-    function trackMovie(button) {
+    window.trackMovie = function(button) {
         const card = button.closest('.movie-card');
         const movie = card.dataset.movie;
         if (!movieData[movie]) {
             movieData[movie] = true;
             localStorage.setItem('movieData', JSON.stringify(movieData));
-            updateProgress();
+            window.updateProgress();
         }
-    }
+    };
 
-    function toggleDetails(quadrant) {
+    window.toggleDetails = function(quadrant) {
         const details = quadrant.querySelector('.quadrant-details');
         const button = quadrant.querySelector('.px-4');
         const isExpanded = details.classList.toggle('expanded');
         button.textContent = isExpanded ? '−' : '+';
-    }
+    };
 
     crisisButton.addEventListener('click', () => {
         const crises = [
@@ -287,13 +289,14 @@
         }, 1500);
     });
 
+    // Initialize the page on load
     window.onload = function() {
         // Set the audio source dynamically
         const audioPlayer = document.getElementById('movie-theme-song');
         audioPlayer.src = `data:audio/mp3;base64,${audioBase64Data}`;
 
         // Initialize the page progress
-        updateProgress();
+        window.updateProgress();
         document.querySelector('.known-knowns .px-4').click();
     };
 
