@@ -15,7 +15,6 @@
       margin: 0;
       overflow-x: hidden;
     }
-
     canvas#starfield {
       position: fixed;
       top: 0;
@@ -23,9 +22,16 @@
       z-index: -1;
     }
 
-    /* Quadrant styling */
+    .glass-card {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
     .quadrant {
       transition: all 0.6s ease;
+      cursor: pointer;
+      border-radius: 1.5rem;
     }
     .quadrant.expanded {
       position: relative;
@@ -35,8 +41,6 @@
       animation: reelAppear 0.8s forwards;
       z-index: 10;
     }
-
-    /* Film reel effect */
     @keyframes reelAppear {
       0% { border-image: none; border-top-color: transparent; border-bottom-color: transparent; }
       50%,100% {
@@ -60,160 +64,44 @@
     }
     @keyframes reelShimmer { from { left: -100%; } to { left: 100%; } }
 
-    /* Crisis styling */
-    .crisis-btn {
-      background: #b91c1c;
+    .expand-btn {
+      transition: all 0.3s ease;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgb(51, 65, 85);
+      border: none;
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      transition: background 0.3s;
+      font-weight: bold;
+      font-size: 1.125rem;
+      cursor: pointer;
     }
+    .expand-btn:hover { background: rgb(71, 85, 105); transform: scale(1.1); }
+    .expand-btn.rotated { transform: rotate(45deg) scale(1.1); }
+
+    .crisis-btn { background: #b91c1c; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background 0.3s; }
     .crisis-btn:hover { background: #dc2626; }
+
     .fade-in { animation: fadeIn 0.5s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  </style>
-</head>
-<body class="p-4 sm:p-8">
-  <canvas id="starfield"></canvas>
 
-  <div class="container mx-auto">
-    <!-- Crisis Quadrant -->
-    <div class="quadrant unknown-unknowns glass-card p-6 rounded-3xl shadow-xl cursor-pointer border border-slate-700" onclick="window.toggleDetails(this)">
-      <div class="quadrant-header flex justify-between items-center">
-        <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🎲</span>
-          <div>
-            <h2 class="text-2xl font-bold text-white">Unknown Unknowns</h2>
-            <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
-          </div>
-        </div>
-        <button class="expand-btn text-xl font-bold">+</button>
-      </div>
+    .movie-card img { width: 100%; height: auto; border-radius: 0.75rem; margin-top: 0.5rem; }
 
-      <div class="quadrant-details mt-4 hidden">
-        <p class="mb-4 text-slate-300">
-          These are the unpredictable "black swan" events that could derail our plans.
-        </p>
-        <div class="glass-card p-4 rounded-xl text-center bg-slate-800/30 border border-slate-600">
-          <h4 class="font-semibold text-slate-300 mb-4">Murphy's Law Crisis Wheel</h4>
-          <p class="text-sm text-slate-400 mb-4">Spin to see which absurd disaster hits next.</p>
-          <button id="crisis-button" class="crisis-btn">🎡 Spin the Crisis Wheel</button>
-          <div id="crisis-result" class="mt-4 p-3 rounded-lg text-sm bg-red-900/30 border border-red-800 hidden fade-in"></div>
-        </div>
-        <div class="mt-6 flex justify-center">
-          <button class="collapse-btn px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500">Collapse ✖</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<script>
-// --- STARFIELD with twinkle ---
-const canvas = document.getElementById("starfield");
-const ctx = canvas.getContext("2d");
-let stars = [];
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  stars = Array.from({length: 150}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 1.5 + 0.5,
-    d: Math.random() * 0.5,
-    twinkleSpeed: Math.random() * 0.05 + 0.01,
-    twinklePhase: Math.random() * Math.PI * 2
-  }));
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "white";
-  stars.forEach(s => {
-    const brightness = (Math.sin(Date.now() * s.twinkleSpeed + s.twinklePhase) + 1) / 2;
-    ctx.globalAlpha = 0.3 + brightness * 0.7;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1.0;
-  stars.forEach(s => {
-    s.y += s.d;
-    if (s.y > canvas.height) {
-      s.x = Math.random() * canvas.width;
-      s.y = 0;
+    .btn-primary {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(99, 102, 241) 100%);
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
     }
-  });
-  requestAnimationFrame(drawStars);
-}
-drawStars();
-
-// --- QUADRANT TOGGLE ---
-window.toggleDetails = function (element) {
-  const details = element.querySelector(".quadrant-details");
-  const expanded = element.classList.contains("expanded");
-
-  document.querySelectorAll(".quadrant").forEach(q => {
-    q.classList.remove("expanded");
-    q.querySelector(".quadrant-details")?.classList.add("hidden");
-  });
-
-  if (!expanded) {
-    element.classList.add("expanded");
-    details.classList.remove("hidden");
-
-    const collapseBtn = details.querySelector(".collapse-btn");
-    collapseBtn.onclick = (e) => {
-      e.stopPropagation();
-      element.classList.remove("expanded");
-      details.classList.add("hidden");
-    };
-  }
-};
-
-// --- CRISIS WHEEL ---
-const crisisButton = document.getElementById('crisis-button');
-const crisisResult = document.getElementById('crisis-result');
-const crises = [
-  "StubHub meltdown: 5 orders, 0 tickets, 6 hours with support 🌀",
-  "Traffic jam caused by an escaped llama parade 🦙",
-  "Popcorn machine caught fire (again) 🍿🔥",
-  "Showtime canceled due to surprise Taylor Swift concert 🎤",
-  "Projector bulb exploded mid-trailer 💡💥",
-  "The app double-charged your card and logged you out 🔒",
-  "Seat mix-up: your row now belongs to a bachelor party 🍺",
-  "Fire alarm drill right as the lights dim 🚨",
-  "Movie mysteriously replaced by a 6-hour insurance seminar 📊",
-  "Snack line ran out of nacho cheese at the worst possible moment 🧀"
-];
-
-crisisButton.addEventListener("click", (e) => {
-  e.stopPropagation();
-  crisisResult.classList.add("hidden");
-
-  let spinIndex = 0;
-  let spins = Math.floor(Math.random() * 15) + 15;
-  const spinInterval = setInterval(() => {
-    crisisResult.classList.remove("hidden");
-    crisisResult.innerHTML = `<div class="font-semibold text-red-300 mb-2">CRISIS WHEEL:</div>
-      <div class="text-red-200">${crises[spinIndex % crises.length]}</div>`;
-    spinIndex++;
-    if (spinIndex > spins) {
-      clearInterval(spinInterval);
-      setTimeout(() => {
-        crisisResult.innerHTML += `
-          <div class="mt-4 pt-3 border-t border-green-800/30">
-            <div class="font-semibold text-green-300 mb-2">Solution:</div>
-            <div class="text-green-200 text-left">
-              Murphy can’t kill the vibe — we pivot, laugh, and keep the quest alive. 🍿
-            </div>
-          </div>`;
-      }, 1000);
-    }
-  }, 150);
-});
-</script>
-</body>
-</html>
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgb(37, 99, 235)
