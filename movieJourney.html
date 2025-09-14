@@ -10,8 +10,7 @@
   body { font-family: 'Inter', sans-serif; background: black; color: #e2e8f0; min-height: 100vh; margin: 0; overflow-x: hidden; }
   canvas#starfield { position: fixed; top:0; left:0; z-index:-1; }
   .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(148,163,184,0.1); }
-  .quadrant { transition: all 0.6s ease; border-radius:1.5rem; margin-bottom:1rem; }
-  .quadrant-header { cursor: pointer; }
+  .quadrant { transition: all 0.6s ease; border-radius:1.5rem; margin-bottom:1rem; cursor: pointer; }
   .quadrant.expanded { position: relative; transform: scale(1.05); border-top: 8px solid transparent; border-bottom: 8px solid transparent; animation: reelAppear 0.8s forwards; z-index:10; }
   @keyframes reelAppear { 0% { border-image: none; border-top-color: transparent; border-bottom-color: transparent; } 50%,100% { border-image: repeating-linear-gradient(to right,#94a3b8 0 10px,transparent 10px 20px) 20 round; border-top-color:#94a3b8; border-bottom-color:#94a3b8; border-image-slice:100; } }
   .quadrant.expanded::after { content:""; position:absolute; top:0; left:-100%; width:200%; height:100%; background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.1) 50%,transparent 100%); animation: reelShimmer 2s infinite; pointer-events:none; border-radius:inherit; }
@@ -30,8 +29,9 @@
   .rewards-badge { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.875rem; font-weight:bold; }
   .rewards-earned { background: rgba(34,197,94,0.2); color: rgb(34,197,94); border:1px solid rgba(34,197,94,0.3); animation: pulseGlow 2s infinite; }
   @keyframes pulseGlow { 0%,100%{box-shadow:0 0 5px rgba(34,197,94,0.5);}50%{box-shadow:0 0 20px rgba(34,197,94,0.8);} }
-  .collapse-btn { padding:0.25rem 0.75rem; background:#374151; color:white; border-radius:0.5rem; margin-top:0.5rem; cursor:pointer; }
-  .collapse-btn:hover { background:#4b5563; }
+  .back-btn { background: rgb(51,65,85); color:white; padding:0.5rem 1rem; border-radius:0.5rem; transition: background 0.3s; margin-top:1rem; }
+  .back-btn:hover { background: rgb(71,85,105); }
+  .screen { display: none; }
 </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -50,12 +50,11 @@
     <audio id="movie-theme-song" controls class="w-full rounded-lg"></audio>
   </div>
 
-  <!-- Main Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
+  <!-- Main Grid Container - This is the primary choice screen -->
+  <div id="main-screen" class="grid grid-cols-1 lg:grid-cols-2 gap-8 screen fade-in">
     <!-- Quadrant 1: Known Knowns -->
-    <div id="quadrant-1" class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700">
-      <div class="quadrant-header flex justify-between items-center" onclick="window.toggleDetails(this.closest('.quadrant'), event)">
+    <div class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-knowns-screen')">
+      <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎬</span>
           <div>
@@ -63,52 +62,12 @@
             <p class="text-sm text-slate-400">The AMC Stubs Goal</p>
           </div>
         </div>
-        <button class="expand-btn">+</button>
-      </div>
-      <div class="quadrant-details mt-4 hidden">
-        <p class="mb-4 text-slate-300">This is our foundation. We know the rules and the rewards. Our goal is clear: to watch the movies and unlock the perks.</p>
-        <div class="glass-card p-4 rounded-xl mb-6">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-semibold text-sm">Movies Watched: <span id="movies-watched" class="font-bold text-white">0</span>/5</span>
-            <span id="rewards-status" class="text-sm font-bold"></span>
-          </div>
-          <div class="progress-bar mt-2 bg-slate-700 rounded-full overflow-hidden">
-            <div id="progress-fill" class="progress-fill h-4 bg-gradient-to-r from-teal-400 to-green-500 transition-all"></div>
-          </div>
-        </div>
-        <div class="mt-6 space-y-4">
-          <div class="movie-card" data-movie="Downton Abbey: The Grand Finale">
-            <h3 class="text-white font-bold">Downton Abbey: The Grand Finale</h3>
-            <img src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene">
-            <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
-          </div>
-          <div class="movie-card" data-movie="Anemone">
-            <h3 class="text-white font-bold">Anemone</h3>
-            <img src="Anemone.jpg" alt="Underwater woman with octopus">
-            <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
-          </div>
-          <div class="movie-card" data-movie="Bugonia">
-            <h3 class="text-white font-bold">Bugonia</h3>
-            <img src="Bugonia.jpg" alt="TV producer shocked with glowing insect">
-            <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
-          </div>
-          <div class="movie-card" data-movie="Hamnet">
-            <h3 class="text-white font-bold">Hamnet</h3>
-            <img src="Hamnet.jpg" alt="Young boy in 16th century England">
-            <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
-          </div>
-          <div class="movie-card" data-movie="Song Sung Blue">
-            <h3 class="text-white font-bold">Song Sung Blue</h3>
-            <img src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage">
-            <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Quadrant 2: Known Unknowns -->
-    <div id="quadrant-2" class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700">
-      <div class="quadrant-header flex justify-between items-center" onclick="window.toggleDetails(this.closest('.quadrant'), event)">
+    <div class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-unknowns-screen')">
+      <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">📝</span>
           <div>
@@ -116,33 +75,12 @@
             <p class="text-sm text-slate-400">The Planning & Research</p>
           </div>
         </div>
-        <button class="expand-btn">+</button>
-      </div>
-      <div class="quadrant-details mt-4 hidden">
-        <p class="mb-4 text-slate-300">These are the gaps in our knowledge that we can fill with a little planning. Let's ask some questions to convert these unknowns into our foundation.</p>
-        <div class="glass-card p-4 rounded-xl space-y-4">
-          <div class="glass-card p-4 rounded-xl border border-slate-700">
-            <p class="text-sm text-slate-300 font-semibold mb-2">Phase 1: Information Overload</p>
-            <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
-              <li>Which movie are we most excited to see first?</li>
-              <li>What if we weren't spending so much time on showtimes and could just focus on popcorn?</li>
-              <li>What's the real cost of our time spent on this decision?</li>
-            </ul>
-          </div>
-          <div class="glass-card p-4 rounded-xl border border-slate-700">
-            <p class="text-sm text-slate-300 font-semibold mb-2">Phase 2: Creative Productivity</p>
-            <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
-              <li>Are we confident that we're in full control of our movie nights, and not just dependent on a third party's business model?</li>
-              <li>How would it feel to have a data-backed case for our movie night, so we can stop guessing?</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Quadrant 3: Unknown Knowns -->
-    <div id="quadrant-3" class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700">
-      <div class="quadrant-header flex justify-between items-center" onclick="window.toggleDetails(this.closest('.quadrant'), event)">
+    <div class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-knowns-screen')">
+      <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🤝</span>
           <div>
@@ -150,20 +88,12 @@
             <p class="text-sm text-slate-400">Our Shared Relational World</p>
           </div>
         </div>
-        <button class="expand-btn">+</button>
-      </div>
-      <div class="quadrant-details mt-4 hidden">
-        <p class="mb-4 text-slate-300">Drawing from the wisdom of "The Untouchables," this is about finding power and safety not in individual strength, but in our shared loyalty and trust. Our combined tastes, hunches, and preferences are our hidden wisdom.</p>
-        <div class="glass-card p-4 rounded-xl">
-          <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment"</h4>
-          <p class="text-sm text-slate-400">Just like Eliot Ness found strength in his team, our movie quest is a shared endeavor. It's in the discussions on the car ride home, the shared laughter in the theater, and the agreement on the next movie that we discover our true collaborative power.</p>
-        </div>
       </div>
     </div>
 
     <!-- Quadrant 4: Unknown Unknowns -->
-    <div id="quadrant-4" class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700">
-      <div class="quadrant-header flex justify-between items-center" onclick="window.toggleDetails(this.closest('.quadrant'), event)">
+    <div class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-unknowns-screen')">
+      <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎲</span>
           <div>
@@ -171,19 +101,139 @@
             <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
           </div>
         </div>
-        <button class="expand-btn">+</button>
       </div>
-      <div class="quadrant-details mt-4 hidden">
-        <p class="mb-4 text-slate-300">These are the unpredictable "black swan" events that could derail our plans. Maybe the movie is sold out, or traffic is a mess. Our resilience is key here.</p>
-        <div class="glass-card p-4 rounded-xl text-center">
-          <h4 class="font-semibold text-slate-300 mb-4">Social Entropy Simulator</h4>
-          <p class="text-sm text-slate-400 mb-4">Click to see how our combined resilience handles an unexpected challenge.</p>
-          <button id="crisis-button" class="crisis-btn">Trigger a Scheduling Crisis!</button>
-          <div id="crisis-result" class="mt-4 p-3 rounded-lg text-sm bg-red-900/30 border border-red-800 hidden fade-in"></div>
+    </div>
+  </div>
+
+  <!-- Known Knowns Screen -->
+  <div id="known-knowns-screen" class="screen">
+    <div class="glass-card p-6 rounded-2xl shadow-xl border border-slate-700">
+      <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
+      <div class="quadrant-header mt-4 flex justify-between items-center">
+        <div class="quadrant-title-group flex items-center space-x-3">
+          <span class="quadrant-icon text-2xl">🎬</span>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Known Knowns</h2>
+            <p class="text-sm text-slate-400">The AMC Stubs Goal</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 mb-4 text-slate-300">This is our foundation. We know the rules and the rewards. Our goal is clear: to watch the movies and unlock the perks.</p>
+      <div class="glass-card p-4 rounded-xl mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-semibold text-sm">Movies Watched: <span id="movies-watched" class="font-bold text-white">0</span>/5</span>
+          <span id="rewards-status" class="text-sm font-bold"></span>
+        </div>
+        <div class="progress-bar mt-2 bg-slate-700 rounded-full overflow-hidden">
+          <div id="progress-fill" class="progress-fill h-4 bg-gradient-to-r from-teal-400 to-green-500 transition-all"></div>
+        </div>
+      </div>
+      <div class="mt-6 space-y-4">
+        <div class="movie-card" data-movie="Downton Abbey: The Grand Finale">
+          <h3 class="text-white font-bold">Downton Abbey: The Grand Finale</h3>
+          <img src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene">
+          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        </div>
+        <div class="movie-card" data-movie="Anemone">
+          <h3 class="text-white font-bold">Anemone</h3>
+          <img src="Anemone.jpg" alt="Underwater woman with octopus">
+          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        </div>
+        <div class="movie-card" data-movie="Bugonia">
+          <h3 class="text-white font-bold">Bugonia</h3>
+          <img src="Bugonia.jpg" alt="TV producer shocked with glowing insect">
+          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        </div>
+        <div class="movie-card" data-movie="Hamnet">
+          <h3 class="text-white font-bold">Hamnet</h3>
+          <img src="Hamnet.jpg" alt="Young boy in 16th century England">
+          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        </div>
+        <div class="movie-card" data-movie="Song Sung Blue">
+          <h3 class="text-white font-bold">Song Sung Blue</h3>
+          <img src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage">
+          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
         </div>
       </div>
     </div>
+  </div>
 
+  <!-- Known Unknowns Screen -->
+  <div id="known-unknowns-screen" class="screen">
+    <div class="glass-card p-6 rounded-2xl shadow-xl border border-slate-700">
+      <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
+      <div class="quadrant-header mt-4 flex justify-between items-center">
+        <div class="quadrant-title-group flex items-center space-x-3">
+          <span class="quadrant-icon text-2xl">📝</span>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Known Unknowns</h2>
+            <p class="text-sm text-slate-400">The Planning & Research</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 mb-4 text-slate-300">These are the gaps in our knowledge that we can fill with a little planning. Let's ask some questions to convert these unknowns into our foundation.</p>
+      <div class="glass-card p-4 rounded-xl space-y-4">
+        <div class="glass-card p-4 rounded-xl border border-slate-700">
+          <p class="text-sm text-slate-300 font-semibold mb-2">Phase 1: Information Overload</p>
+          <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
+            <li>Which movie are we most excited to see first?</li>
+            <li>What if we weren't spending so much time on showtimes and could just focus on popcorn?</li>
+            <li>What's the real cost of our time spent on this decision?</li>
+          </ul>
+        </div>
+        <div class="glass-card p-4 rounded-xl border border-slate-700">
+          <p class="text-sm text-slate-300 font-semibold mb-2">Phase 2: Creative Productivity</p>
+          <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
+            <li>Are we confident that we're in full control of our movie nights, and not just dependent on a third party's business model?</li>
+            <li>How would it feel to have a data-backed case for our movie night, so we can stop guessing?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unknown Knowns Screen -->
+  <div id="unknown-knowns-screen" class="screen">
+    <div class="glass-card p-6 rounded-2xl shadow-xl border border-slate-700">
+      <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
+      <div class="quadrant-header mt-4 flex justify-between items-center">
+        <div class="quadrant-title-group flex items-center space-x-3">
+          <span class="quadrant-icon text-2xl">🤝</span>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Unknown Knowns</h2>
+            <p class="text-sm text-slate-400">Our Shared Relational World</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 mb-4 text-slate-300">Drawing from the wisdom of "The Untouchables," this is about finding power and safety not in individual strength, but in our shared loyalty and trust. Our combined tastes, hunches, and preferences are our hidden wisdom.</p>
+      <div class="glass-card p-4 rounded-xl">
+        <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment"</h4>
+        <p class="text-sm text-slate-400">Just like Eliot Ness found strength in his team, our movie quest is a shared endeavor. It's in the discussions on the car ride home, the shared laughter in the theater, and the agreement on the next movie that we discover our true collaborative power.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unknown Unknowns Screen -->
+  <div id="unknown-unknowns-screen" class="screen">
+    <div class="glass-card p-6 rounded-2xl shadow-xl border border-slate-700">
+      <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
+      <div class="quadrant-header mt-4 flex justify-between items-center">
+        <div class="quadrant-title-group flex items-center space-x-3">
+          <span class="quadrant-icon text-2xl">🎲</span>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Unknown Unknowns</h2>
+            <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 mb-4 text-slate-300">These are the unpredictable "black swan" events that could derail our plans. Maybe the movie is sold out, or traffic is a mess. Our resilience is key here.</p>
+      <div class="glass-card p-4 rounded-xl text-center">
+        <h4 class="font-semibold text-slate-300 mb-4">Social Entropy Simulator</h4>
+        <p class="text-sm text-slate-400 mb-4">Click to see how our combined resilience handles an unexpected challenge.</p>
+        <button id="crisis-button" class="crisis-btn">Trigger a Scheduling Crisis!</button>
+        <div id="crisis-result" class="mt-4 p-3 rounded-lg text-sm bg-red-900/30 border border-red-800 hidden fade-in"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -200,17 +250,36 @@ const movieCards = document.querySelectorAll('.movie-card');
 
 function updateProgress() {
   const count = Object.keys(movieData).length;
-  moviesWatchedSpan.textContent = count;
-  progressFill.style.width = (count / totalMovies * 100) + '%';
-  movieCards.forEach(card => {
-    const movie = card.dataset.movie;
-    const button = card.querySelector('button');
-    if(movieData[movie]) { card.classList.add('watched'); button.disabled=true; button.textContent="✓ Watched"; } 
-    else { card.classList.remove('watched'); button.disabled=false; button.textContent="Mark as Watched"; }
-  });
-  if(count>=3){ rewardsStatus.innerHTML='<span class="rewards-badge rewards-earned">🎉 $50 Gift Card Earned! 🎉</span>'; }
-  else if(count>=2){ rewardsStatus.innerHTML='<span class="rewards-badge rewards-earned">👏 $15 Gift Card Earned! 👏</span>'; }
-  else { rewardsStatus.innerHTML=''; }
+  if(moviesWatchedSpan) {
+    moviesWatchedSpan.textContent = count;
+  }
+  if(progressFill) {
+    progressFill.style.width = (count / totalMovies * 100) + '%';
+  }
+  if(movieCards.length > 0) {
+    movieCards.forEach(card => {
+      const movie = card.dataset.movie;
+      const button = card.querySelector('button');
+      if(movieData[movie]) { 
+        card.classList.add('watched'); 
+        if(button) { 
+          button.disabled=true; 
+          button.textContent="✓ Watched"; 
+        } 
+      } else { 
+        card.classList.remove('watched'); 
+        if(button) { 
+          button.disabled=false; 
+          button.textContent="Mark as Watched"; 
+        } 
+      }
+    });
+  }
+  if(rewardsStatus) {
+    if(count>=3){ rewardsStatus.innerHTML='<span class="rewards-badge rewards-earned">🎉 $50 Gift Card Earned! 🎉</span>'; }
+    else if(count>=2){ rewardsStatus.innerHTML='<span class="rewards-badge rewards-earned">👏 $15 Gift Card Earned! 👏</span>'; }
+    else { rewardsStatus.innerHTML=''; }
+  }
 }
 
 window.trackMovie = function(button,event){
@@ -225,17 +294,19 @@ window.trackMovie = function(button,event){
   }
 }
 
-window.toggleDetails = function(quadrant, event){
-  // Check if an event object exists before trying to call stopPropagation
-  if (event) {
-    event.stopPropagation();
+window.showScreen = function(screenId) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.style.display = 'none';
+  });
+  // Show the requested screen
+  const screenToShow = document.getElementById(screenId);
+  if (screenToShow) {
+    screenToShow.style.display = 'block';
+    if(screenId === 'known-knowns-screen') {
+      updateProgress();
+    }
   }
-  const details = quadrant.querySelector('.quadrant-details');
-  const btn = quadrant.querySelector('.expand-btn');
-  const isExpanded = details.classList.toggle('hidden');
-  quadrant.classList.toggle('expanded',!isExpanded);
-  btn.textContent = isExpanded ? '+' : '−';
-  btn.classList.toggle('rotated',!isExpanded);
 }
 
 crisisButton.addEventListener('click',(e)=>{
@@ -259,8 +330,7 @@ window.addEventListener('resize',resize); resize(); animate();
 
 window.onload=function(){
   document.getElementById('movie-theme-song').src=audioUrl;
-  updateProgress();
-  window.toggleDetails(document.getElementById('quadrant-1'));
+  window.showScreen('main-screen');
 }
 </script>
 </body>
