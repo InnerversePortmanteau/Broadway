@@ -53,7 +53,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
     <!-- Quadrant 1: Known Knowns -->
-    <div id="quadrant-1" class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700">
+    <div id="quadrant-1" class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this, event)">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎬</span>
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Quadrant 2: Known Unknowns -->
-    <div id="quadrant-2" class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700">
+    <div id="quadrant-2" class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this, event)">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">📝</span>
@@ -140,7 +140,7 @@
     </div>
 
     <!-- Quadrant 3: Unknown Knowns -->
-    <div id="quadrant-3" class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700">
+    <div id="quadrant-3" class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this, event)">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🤝</span>
@@ -161,7 +161,7 @@
     </div>
 
     <!-- Quadrant 4: Unknown Unknowns -->
-    <div id="quadrant-4" class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700">
+    <div id="quadrant-4" class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this, event)">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎲</span>
@@ -224,7 +224,11 @@ window.trackMovie = function(button,event){
   }
 }
 
-window.toggleDetails = function(quadrant){
+window.toggleDetails = function(quadrant, event){
+  // Prevent clicks on buttons or links inside the quadrant from triggering a toggle
+  if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'a') {
+    return;
+  }
   const details = quadrant.querySelector('.quadrant-details');
   const btn = quadrant.querySelector('.expand-btn');
   const isExpanded = details.classList.toggle('hidden');
@@ -244,22 +248,35 @@ crisisButton.addEventListener('click',(e)=>{
   },1500);
 });
 
-// New event listeners to fix the mobile scroll issue
-let touchStartY = 0;
+// New, more reliable event listeners for mobile scrolling
 const quadrants = document.querySelectorAll('.quadrant');
+let touchStartX = 0;
+let touchStartY = 0;
+let wasMoved = false;
+
 quadrants.forEach(quadrant => {
     quadrant.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
+        wasMoved = false; // Reset the flag
+    });
+
+    quadrant.addEventListener('touchmove', (e) => {
+        const deltaX = e.touches[0].clientX - touchStartX;
+        const deltaY = e.touches[0].clientY - touchStartY;
+        // If the finger moves more than a small threshold, it's a scroll, not a tap
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            wasMoved = true;
+        }
     });
 
     quadrant.addEventListener('touchend', (e) => {
-        const touchEndY = e.changedTouches[0].clientY;
-        const deltaY = Math.abs(touchStartY - touchEndY);
-        
-        // Only trigger toggleDetails if the movement was minimal (a tap, not a scroll)
-        if (deltaY < 5) { // 5 pixel threshold
-            window.toggleDetails(quadrant);
+        // If the finger moved significantly, it was a scroll, so don't toggle
+        if (wasMoved) {
+            return;
         }
+        // Otherwise, it was a tap, so we call the toggle function
+        window.toggleDetails(quadrant, e);
     });
 });
 
@@ -275,7 +292,7 @@ window.addEventListener('resize',resize); resize(); animate();
 window.onload=function(){
   document.getElementById('movie-theme-song').src=audioUrl;
   updateProgress();
-  window.toggleDetails(document.getElementById('quadrant-1'));
+  window.toggleDetails(document.getElementById('quadrant-1'), {target: document.getElementById('quadrant-1'), stopPropagation:()=>{}});
 }
 </script>
 </body>
