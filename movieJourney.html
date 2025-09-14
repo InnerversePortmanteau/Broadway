@@ -25,7 +25,7 @@
   .movie-card img { width: 100%; max-height: 256px; object-fit: cover; border-radius:0.75rem; margin-top:0.5rem; }
   .btn-primary { width:100%; padding:0.5rem 1rem; margin-top:0.5rem; font-weight:600; color:white; background:linear-gradient(135deg, rgb(59,130,246) 0%, rgb(99,102,241) 100%); border:none; border-radius:0.5rem; box-shadow:0 4px 14px 0 rgba(59,130,246,0.3); transition: all 0.3s ease; cursor:pointer; }
   .btn-primary:hover:not(:disabled) { background:linear-gradient(135deg, rgb(37,99,235) 0%, rgb(79,70,229) 100%); transform:translateY(-1px); box-shadow:0 10px 25px rgba(59,130,246,0.4); }
-  .btn-primary:disabled { cursor:not-allowed; }
+  .btn-primary:disabled { cursor:not-allowed; opacity: 0.5; }
   .rewards-badge { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.875rem; font-weight:bold; }
   .rewards-earned { background: rgba(34,197,94,0.2); color: rgb(34,197,94); border:1px solid rgba(34,197,94,0.3); animation: pulseGlow 2s infinite; }
   @keyframes pulseGlow { 0%,100%{box-shadow:0 0 5px rgba(34,197,94,0.5);}50%{box-shadow:0 0 20px rgba(34,197,94,0.8);} }
@@ -35,6 +35,13 @@
   .quiz-container { display: none; }
   .quiz-button { background: #10b981; color: white; font-weight: 600; }
   .quiz-button:hover { background: #059669; }
+  .quadrant-completed::after { 
+    content: "✓"; position: absolute; top: 1rem; right: 1rem; 
+    background: #10b981; color: white; border-radius: 50%; 
+    width: 2rem; height: 2rem; display: flex; align-items: center; 
+    justify-content: center; font-weight: bold; font-size: 1.25rem; 
+  }
+  .processing { pointer-events: none; opacity: 0.7; }
 </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -49,65 +56,65 @@
 
   <!-- Audio Player -->
   <div class="glass-card rounded-2xl p-6 mb-8 text-center">
-    <h3 class="text-2xl font-bold text-white mb-4 flex items-center justify-center gap-2"><span class="text-2xl">🎵</span> Our Movie Quest Theme Song</h3>
+    <h3 class="text-2xl font-bold text-white mb-4 flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🎵</span> Our Movie Quest Theme Song</h3>
     <audio id="movie-theme-song" controls class="w-full rounded-lg"></audio>
   </div>
 
   <!-- Main Grid Container - This is the primary choice screen -->
   <div id="main-screen" class="grid grid-cols-1 lg:grid-cols-2 gap-8 screen fade-in">
     <!-- Quadrant 1: Known Knowns -->
-    <div class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-knowns-screen')">
+    <div class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-knowns-screen')" role="button" tabindex="0" aria-label="Known Knowns: The AMC Stubs Goal. Click to learn more.">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🎬</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🎬</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Known Knowns</h2>
-            <p class="text-sm text-slate-400">The AMC Stubs Goal</p>
+            <p id="known-knowns-progress" class="text-sm text-slate-400">The AMC Stubs Goal</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Quadrant 2: Known Unknowns -->
-    <div class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-unknowns-screen')">
+    <div class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('known-unknowns-screen')" role="button" tabindex="0" aria-label="Known Unknowns: The Planning & Research. Click to start the quiz.">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">📝</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">📝</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Known Unknowns</h2>
-            <p class="text-sm text-slate-400">The Planning & Research</p>
+            <p id="known-unknowns-progress" class="text-sm text-slate-400">The Planning & Research</p>
           </div>
         </div>
       </div>
-      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
+      <p class="mt-4 text-slate-400 hidden">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
 
     <!-- Quadrant 3: Unknown Knowns -->
-    <div class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-knowns-screen')">
+    <div class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-knowns-screen')" role="button" tabindex="0" aria-label="Unknown Knowns: Our Shared Relational World. Click to take the loyalty quiz.">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🤝</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🤝</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Unknown Knowns</h2>
-            <p class="text-sm text-slate-400">Our Shared Relational World</p>
+            <p id="unknown-knowns-progress" class="text-sm text-slate-400">Our Shared Relational World</p>
           </div>
         </div>
       </div>
-      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
+      <p class="mt-4 text-slate-400 hidden">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
 
     <!-- Quadrant 4: Unknown Unknowns -->
-    <div class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-unknowns-screen')">
+    <div class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.showScreen('unknown-unknowns-screen')" role="button" tabindex="0" aria-label="Unknown Unknowns: Navigating the Unpredictable. Click to run the simulation.">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🎲</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🎲</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Unknown Unknowns</h2>
-            <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
+            <p id="unknown-unknowns-progress" class="text-sm text-slate-400">Navigating the Unpredictable</p>
           </div>
         </div>
       </div>
-      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
+      <p class="mt-4 text-slate-400 hidden">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
   </div>
 
@@ -117,7 +124,7 @@
       <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
       <div class="quadrant-header mt-4 flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🎬</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🎬</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Known Knowns</h2>
             <p class="text-sm text-slate-400">The AMC Stubs Goal</p>
@@ -140,17 +147,17 @@
           <div class="h-10 flex items-center justify-center">
             <h3 class="text-white font-bold">Downton Abbey: The Grand Finale</h3>
           </div>
-          <img class="w-full max-h-48 object-cover shadow-lg" src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene">
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW92aWUgUG9zdGVyPC90ZXh0Pgo8L3N2Zz4='">
           <div class="flex justify-center space-x-4 mt-2">
-            <a href="https://www.imdb.com/find?q=Downton+Abbey:+The+Grand+Finale" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
-            <a href="https://www.rottentomatoes.com/search?q=Downton+Abbey:+The+Grand+Finale" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+            <a href="https://www.imdb.com/find?q=Downton+Abbey:+The+Grand+Finale" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Downton+Abbey:+The+Grand+Finale" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
           </div>
           <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
-          <div class="quiz-container space-y-2 mt-4 hidden">
+          <div class="quiz-container space-y-2 mt-4 hidden" role="region" aria-live="polite">
             <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
             <div class="quiz-question text-slate-300"></div>
-            <div class="quiz-options flex flex-col space-y-2"></div>
-            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
             <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
           </div>
         </div>
@@ -158,17 +165,17 @@
           <div class="h-10 flex items-center justify-center">
             <h3 class="text-white font-bold">Anemone</h3>
           </div>
-          <img class="w-full max-h-48 object-cover shadow-lg" src="Anemone.jpg" alt="Underwater woman with octopus">
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Anemone.jpg" alt="Underwater woman with octopus" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW92aWUgUG9zdGVyPC90ZXh0Pgo8L3N2Zz4='">
           <div class="flex justify-center space-x-4 mt-2">
-            <a href="https://www.imdb.com/find?q=Anemone" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
-            <a href="https://www.rottentomatoes.com/search?q=Anemone" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+            <a href="https://www.imdb.com/find?q=Anemone" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Anemone" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
           </div>
           <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
-          <div class="quiz-container space-y-2 mt-4 hidden">
+          <div class="quiz-container space-y-2 mt-4 hidden" role="region" aria-live="polite">
             <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
             <div class="quiz-question text-slate-300"></div>
-            <div class="quiz-options flex flex-col space-y-2"></div>
-            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
             <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
           </div>
         </div>
@@ -176,17 +183,17 @@
           <div class="h-10 flex items-center justify-center">
             <h3 class="text-white font-bold">Bugonia</h3>
           </div>
-          <img class="w-full max-h-48 object-cover shadow-lg" src="Bugonia.jpg" alt="TV producer shocked with glowing insect">
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Bugonia.jpg" alt="TV producer shocked with glowing insect" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW92aWUgUG9zdGVyPC90ZXh0Pgo8L3N2Zz4='">
           <div class="flex justify-center space-x-4 mt-2">
-            <a href="https://www.imdb.com/find?q=Bugonia" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
-            <a href="https://www.rottentomatoes.com/search?q=Bugonia" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+            <a href="https://www.imdb.com/find?q=Bugonia" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Bugonia" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
           </div>
           <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
-          <div class="quiz-container space-y-2 mt-4 hidden">
+          <div class="quiz-container space-y-2 mt-4 hidden" role="region" aria-live="polite">
             <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
             <div class="quiz-question text-slate-300"></div>
-            <div class="quiz-options flex flex-col space-y-2"></div>
-            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
             <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
           </div>
         </div>
@@ -194,17 +201,17 @@
           <div class="h-10 flex items-center justify-center">
             <h3 class="text-white font-bold">Hamnet</h3>
           </div>
-          <img class="w-full max-h-48 object-cover shadow-lg" src="Hamnet.jpg" alt="Young boy in 16th century England">
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Hamnet.jpg" alt="Young boy in 16th century England" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW92aWUgUG9zdGVyPC90ZXh0Pgo8L3N2Zz4='">
           <div class="flex justify-center space-x-4 mt-2">
-            <a href="https://www.imdb.com/find?q=Hamnet" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
-            <a href="https://www.rottentomatoes.com/search?q=Hamnet" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+            <a href="https://www.imdb.com/find?q=Hamnet" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Hamnet" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
           </div>
           <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
-          <div class="quiz-container space-y-2 mt-4 hidden">
+          <div class="quiz-container space-y-2 mt-4 hidden" role="region" aria-live="polite">
             <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
             <div class="quiz-question text-slate-300"></div>
-            <div class="quiz-options flex flex-col space-y-2"></div>
-            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
             <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
           </div>
         </div>
@@ -212,17 +219,17 @@
           <div class="h-10 flex items-center justify-center">
             <h3 class="text-white font-bold">Song Sung Blue</h3>
           </div>
-          <img class="w-full max-h-48 object-cover shadow-lg" src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage">
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW92aWUgUG9zdGVyPC90ZXh0Pgo8L3N2Zz4='">
           <div class="flex justify-center space-x-4 mt-2">
-            <a href="https://www.imdb.com/find?q=Song+Sung+Blue" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
-            <a href="https://www.rottentomatoes.com/search?q=Song+Sung+Blue" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+            <a href="https://www.imdb.com/find?q=Song+Sung+Blue" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Song+Sung+Blue" target="_blank" rel="noopener" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
           </div>
           <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
-          <div class="quiz-container space-y-2 mt-4 hidden">
+          <div class="quiz-container space-y-2 mt-4 hidden" role="region" aria-live="polite">
             <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
             <div class="quiz-question text-slate-300"></div>
-            <div class="quiz-options flex flex-col space-y-2"></div>
-            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
             <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
           </div>
         </div>
@@ -236,7 +243,7 @@
       <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
       <div class="quadrant-header mt-4 flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">📝</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">📝</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Known Unknowns</h2>
             <p class="text-sm text-slate-400">The Planning & Research</p>
@@ -257,7 +264,7 @@
       <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
       <div class="quadrant-header mt-4 flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🤝</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🤝</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Unknown Knowns</h2>
             <p class="text-sm text-slate-400">Our Shared Relational World</p>
@@ -269,10 +276,10 @@
         <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment" Quiz</h4>
         <p class="text-sm text-slate-400 mb-4">Are you ready to commit to the team?</p>
         <button id="relational-quiz-button" class="btn-primary" onclick="window.startRelationalQuiz()">Prove Your Loyalty</button>
-        <div class="quiz-container space-y-2 mt-4 hidden" id="relational-quiz-container">
+        <div class="quiz-container space-y-2 mt-4 hidden" id="relational-quiz-container" role="region" aria-live="polite">
           <div class="quiz-question text-slate-300"></div>
-          <div class="quiz-options flex flex-col space-y-2"></div>
-          <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+          <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+          <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
         </div>
       </div>
     </div>
@@ -284,7 +291,7 @@
       <button class="back-btn" onclick="window.showScreen('main-screen')">← Back</button>
       <div class="quadrant-header mt-4 flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
-          <span class="quadrant-icon text-2xl">🎲</span>
+          <span class="quadrant-icon text-2xl" aria-hidden="true">🎲</span>
           <div>
             <h2 class="text-2xl font-bold text-white">Unknown Unknowns</h2>
             <p class="text-sm text-slate-400">Navigating the Unpredictable</p>
@@ -296,11 +303,11 @@
         <h4 class="font-semibold text-slate-300 mb-4">Social Entropy Simulator</h4>
         <p class="text-sm text-slate-400 mb-4">Click to simulate an unexpected event and see our shared resilience in action.</p>
         <button id="start-crisis-button" class="crisis-btn" onclick="window.startCrisisSimulation()">Begin Simulation</button>
-        <div id="crisis-container" class="mt-4 p-3 rounded-lg text-sm hidden fade-in">
+        <div id="crisis-container" class="mt-4 p-3 rounded-lg text-sm hidden fade-in" role="region" aria-live="polite">
           <div id="crisis-event" class="font-semibold text-red-300 mb-2"></div>
           <div id="crisis-solution" class="mt-4 pt-3 border-t border-green-800/30">
             <div class="font-semibold text-green-300 mb-2">Relational Solution:</div>
-            <div id="crisis-solution-text" class="text-green-200 text-left"></div>
+            <div id="crisis-solution-text" class="text-green-200 text-left" aria-live="assertive"></div>
           </div>
         </div>
       </div>
@@ -310,7 +317,28 @@
 
 <script>
 const audioUrl = 'https://cdn.jsdelivr.net/gh/InnerversePortmanteau/Broadway/our-movie-quest.mp3';
-let movieData = JSON.parse(localStorage.getItem('movieData')) || {};
+let movieData = {};
+let sectionProgress = { knownKnowns: false, knownUnknowns: false, unknownKnowns: false, unknownUnknowns: false };
+
+function loadData() {
+  try {
+    movieData = JSON.parse(localStorage.getItem('movieData')) || {};
+    sectionProgress = JSON.parse(localStorage.getItem('sectionProgress')) || sectionProgress;
+  } catch (e) {
+    console.warn('localStorage not available, using memory storage');
+    movieData = {};
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('movieData', JSON.stringify(movieData));
+    localStorage.setItem('sectionProgress', JSON.stringify(sectionProgress));
+  } catch (e) {
+    console.warn('Cannot save to localStorage');
+  }
+}
+
 const totalMovies = 5;
 const progressFill = document.getElementById('progress-fill');
 const moviesWatchedSpan = document.getElementById('movies-watched');
@@ -408,14 +436,37 @@ const blackSwanEvents = [
   }
 ];
 
+function updateQuadrantStatus(className, isComplete, progressText) {
+  const quadrant = document.querySelector(`.${className}`);
+  const progress = document.getElementById(`${className}-progress`);
+  if (!quadrant || !progress) return;
+
+  if (isComplete) {
+    quadrant.classList.add('quadrant-completed');
+    progress.textContent = progressText;
+  } else {
+    quadrant.classList.remove('quadrant-completed');
+    progress.textContent = progressText;
+  }
+}
+
+function updateSectionProgress() {
+  const movieCount = Object.keys(movieData).length;
+  updateQuadrantStatus('known-knowns', movieCount >= totalMovies, `${movieCount}/${totalMovies} movies watched`);
+  updateQuadrantStatus('known-unknowns', currentKnownUnknownsQuestion >= Object.keys(knownUnknownsQuizzes).length, `${currentKnownUnknownsQuestion}/${Object.keys(knownUnknownsQuizzes).length} questions answered`);
+  updateQuadrantStatus('unknown-knowns', sectionProgress.unknownKnowns, `Loyalty proven!`);
+  updateQuadrantStatus('unknown-unknowns', sectionProgress.unknownUnknowns, `Ready for anything!`);
+  saveData();
+}
+
 window.startKnownUnknownsQuiz = function() {
   const container = document.getElementById('known-unknowns-quiz-container');
   container.innerHTML = `
-    <div class="glass-card p-4 rounded-xl space-y-4">
+    <div class="glass-card p-4 rounded-xl space-y-4" role="region" aria-live="polite">
       <h4 class="text-lg font-bold text-white">The Planning & Research Quiz</h4>
       <div class="quiz-question text-slate-300"></div>
-      <div class="quiz-options flex flex-col space-y-2"></div>
-      <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+      <div class="quiz-options flex flex-col space-y-2" role="group"></div>
+      <p class="quiz-feedback text-sm mt-2 font-semibold" aria-live="assertive"></p>
     </div>
   `;
   currentKnownUnknownsQuestion = 0;
@@ -446,12 +497,13 @@ window.checkKnownUnknownsAnswer = function(selectedIndex) {
   const container = document.getElementById('known-unknowns-quiz-container');
   const quizData = Object.values(knownUnknownsQuizzes)[currentKnownUnknownsQuestion];
   const quizFeedback = container.querySelector('.quiz-feedback');
-  
+  const options = container.querySelectorAll('.quiz-options button');
+  options.forEach(btn => btn.disabled = true);
+
   if (selectedIndex === quizData.correctAnswer) {
     quizFeedback.textContent = 'Insight Gained!';
     quizFeedback.classList.remove('text-red-400');
     quizFeedback.classList.add('text-green-400');
-    container.querySelectorAll('.quiz-options button').forEach(button => button.disabled = true);
     
     currentKnownUnknownsQuestion++;
     setTimeout(() => {
@@ -459,6 +511,8 @@ window.checkKnownUnknownsAnswer = function(selectedIndex) {
         loadKnownUnknownsQuestion();
       } else {
         container.innerHTML = `<p class="text-lg font-bold text-green-400">All unknowns have been converted! You are ready for the next phase of your quest.</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
+        sectionProgress.knownUnknowns = true;
+        updateSectionProgress();
       }
     }, 1500);
     
@@ -466,6 +520,7 @@ window.checkKnownUnknownsAnswer = function(selectedIndex) {
     quizFeedback.textContent = 'Oops! That\'s not it. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
+    setTimeout(() => options.forEach(btn => btn.disabled = false), 1000);
   }
 }
 
@@ -497,19 +552,22 @@ window.checkRelationalAnswer = function(selectedIndex) {
   const container = document.getElementById('relational-quiz-container');
   const quizOptions = container.querySelector('.quiz-options');
   const quizFeedback = container.querySelector('.quiz-feedback');
-  
+  quizOptions.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
   if (selectedIndex === unknownKnownsQuiz.correctAnswer) {
     quizFeedback.textContent = 'Insight Gained: "What are you prepared to do?! - You are a true member of the team!"';
     quizFeedback.classList.remove('text-red-400');
     quizFeedback.classList.add('text-green-400');
-    quizOptions.querySelectorAll('button').forEach(btn => btn.disabled = true);
     setTimeout(() => {
       container.innerHTML = `<p class="text-lg font-bold text-green-400">Your loyalty is proven!</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
+      sectionProgress.unknownKnowns = true;
+      updateSectionProgress();
     }, 2000);
   } else {
     quizFeedback.textContent = 'Oops! That\'s not it. Trust is earned. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
+    setTimeout(() => quizOptions.querySelectorAll('button').forEach(btn => btn.disabled = false), 1000);
   }
 }
 
@@ -554,10 +612,14 @@ function updateProgress() {
     else if(count>=2){ rewardsStatus.innerHTML='<span class="rewards-badge rewards-earned">👏 $15 Gift Card Earned! 👏</span>'; }
     else { rewardsStatus.innerHTML=''; }
   }
+  updateSectionProgress();
 }
 
 window.showQuiz = function(button, event) {
   event.stopPropagation();
+  if (button.dataset.processing) return;
+  button.dataset.processing = "true";
+
   const card = button.closest('.movie-card');
   const quizContainer = card.querySelector('.quiz-container');
   
@@ -568,6 +630,7 @@ window.showQuiz = function(button, event) {
       startQuiz(card, quizData);
       button.style.display = 'none';
       quizContainer.style.display = 'block';
+      setTimeout(() => delete button.dataset.processing, 500);
     }
   }
 }
@@ -596,17 +659,20 @@ function startQuiz(card, quizData) {
 window.checkAnswer = function(card, quizData, selectedIndex) {
   const quizFeedback = card.querySelector('.quiz-feedback');
   const watchedBtn = card.querySelector('.mark-watched-btn');
-
+  const options = card.querySelectorAll('.quiz-options button');
+  options.forEach(button => button.disabled = true);
+  
   if (selectedIndex === quizData.correctAnswer) {
     quizFeedback.textContent = 'Correct! That\'s the one!';
     quizFeedback.classList.remove('text-red-400');
     quizFeedback.classList.add('text-green-400');
     watchedBtn.classList.remove('hidden');
-    card.querySelectorAll('.quiz-options button').forEach(button => button.disabled = true);
+    watchedBtn.focus();
   } else {
     quizFeedback.textContent = 'Oops! That\'s not it. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
+    setTimeout(() => options.forEach(button => button.disabled = false), 1000);
   }
 }
 
@@ -616,7 +682,7 @@ window.markAsWatched = function(button, event) {
   const movie = card.dataset.movie;
   if(!movieData[movie]){
     movieData[movie] = true;
-    localStorage.setItem('movieData', JSON.stringify(movieData));
+    saveData();
     updateProgress();
   }
 }
@@ -640,19 +706,15 @@ window.startCrisisSimulation = function() {
   const crisisEvent = document.getElementById('crisis-event');
   const crisisSolution = document.getElementById('crisis-solution-text');
   
-  // Choose a random, unique event
   const randomIndex = Math.floor(Math.random() * blackSwanEvents.length);
   const selectedCrisis = blackSwanEvents[randomIndex];
   
-  // Set the content
   crisisEvent.textContent = `CRISIS: ${selectedCrisis.event}`;
   crisisSolution.textContent = selectedCrisis.solution;
 
-  // Show the crisis container
   startButton.style.display = 'none';
   crisisContainer.classList.remove('hidden');
   
-  // Add the "weirder" button
   const weirderButton = document.createElement('button');
   weirderButton.className = 'back-btn mt-4';
   weirderButton.textContent = 'What if it gets weirder?';
@@ -663,7 +725,6 @@ window.startCrisisSimulation = function() {
   };
   crisisContainer.appendChild(weirderButton);
 
-  // Add a button to reset the simulation
   const resetButton = document.createElement('button');
   resetButton.className = 'back-btn mt-4 ml-2';
   resetButton.textContent = 'Reset Simulation';
@@ -685,8 +746,25 @@ function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let s of 
 window.addEventListener('resize',resize); resize(); animate();
 
 window.onload=function(){
-  document.getElementById('movie-theme-song').src=audioUrl;
+  loadData();
+  
+  const audioElement = document.getElementById('movie-theme-song');
+  if (audioElement) {
+    audioElement.src = audioUrl;
+    audioElement.onerror = function() {
+      console.warn('Audio file could not be loaded');
+      this.style.display = 'none';
+    };
+  }
+  
   window.showScreen('main-screen');
+  updateProgress();
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      window.showScreen('main-screen');
+    }
+  });
 }
 </script>
 </body>
