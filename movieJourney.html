@@ -402,37 +402,63 @@ const knownUnknownsQuizzes = {
 };
 let currentKnownUnknownsQuestion = 0;
 
-const unknownKnownsQuiz = {
-  question: "Eliot Ness is looking for his team. He turns to you and asks: 'What are you prepared to do?' What is your answer?",
-  answers: [
-    "I'm prepared to order the largest popcorn bucket and share none of it.",
-    "I'm prepared to handle the ticket queue, but only if you hold my place in the concession line.",
-    "I'm prepared to be the one who makes a promise... and then, when I'm in over my head, I'm prepared to be the one to go to a meeting, and then, at that meeting, make a different promise.",
-    "I'm prepared to make a new plan. I'm prepared to follow it.",
-  ],
-  correctAnswer: 3
-};
+const unknownKnownsQuizzes = [
+  {
+    question: "Eliot Ness is looking for his team. He turns to you and asks: 'What are you prepared to do?' What is your answer?",
+    answers: [
+      "I'm prepared to order the largest popcorn bucket and share none of it.",
+      "I'm prepared to handle the ticket queue, but only if you hold my place in the concession line.",
+      "I'm prepared to be the one who makes a promise... and then, when I'm in over my head, I'm prepared to be the one to go to a meeting, and then, at that meeting, make a different promise.",
+      "I'm prepared to make a new plan. I'm prepared to follow it.",
+    ],
+    correctAnswer: 3,
+    zinger: "'There is no crying in baseball!' Just kidding. The real quote is: 'What are you prepared to do?!'",
+  },
+  {
+    question: "You've just found a crucial piece of information, but it means deviating from the plan. What's your immediate move?",
+    answers: [
+      "'I'm the chief, I'm the chief! No, I'm the chief!'",
+      "'Leave the gun. Take the cannoli.'",
+      "I go back and get them, every last one.",
+      "'Let's re-evaluate. The numbers are speaking to me.'",
+    ],
+    correctAnswer: 2,
+    zinger: "'Leave the gun. Take the cannoli.' is a great line, but the correct answer is 'I go back and get them, every last one.'",
+  },
+  {
+    question: "A trusted team member makes a small mistake that causes a minor setback. What is your response?",
+    answers: [
+      "'You're an errand boy, sent by grocery clerks, to collect a bill!'",
+      "'You're a disgrace to the entire team! Don't you know who I am?'",
+      "'We’re a team. There’s no me in team. It’s a team-a-go-go!'",
+      "'A team, that’s all we are. We're a team, and we'll get through this together.'",
+    ],
+    correctAnswer: 3,
+    zinger: "'You're an errand boy...' is fun, but the right answer is a more classic display of team-based loyalty!",
+  },
+];
+let currentUnknownKnownsQuestion = 0;
 
 const blackSwanEvents = [
   {
-    event: "The theater's main projector fails, and the film begins to play in reverse.",
-    solution: "We work together to narrate the plot backward, creating a shared avant-garde masterpiece.",
-    weirder: "The projectionist, now our new best friend, reveals the movie's secret alternate ending, which involves a time-traveling koala."
+    event: "A scheduling vortex opens, double-booking us for two different movie premieres at the same time.",
+    solution: "Instead of choosing, we decide to split up, live-stream to each other, and create the world’s first collaborative two-perspective movie review.",
+    weirder: "The scheduling vortex collapses, revealing a parallel dimension where all movies are silent films, and our only form of communication is interpretive dance."
   },
   {
-    event: "A flash mob spontaneously bursts into song in the middle of a pivotal scene.",
-    solution: "We join in, harmonizing with the flash mob to improve the soundtrack.",
-    weirder: "The lead dancer reveals they've been sent from the future to warn us about the rising price of popcorn."
+    event: "During a crucial moment of 'Heads-Down Focus Time,' a movie theatre alarm blares for no reason.",
+    solution: "We calmly evacuate, find a nearby cafe, and turn the unexpected break into a 'Wellness Time' session, reflecting on the experience over coffee.",
+    weirder: "The alarm was a signal. We're now being recruited by a secret agency to join a team of highly-trained movie-goers who defuse cinematic crises."
   },
   {
-    event: "An unexpected rainstorm floods the parking lot, trapping us inside the cinema.",
-    solution: "We use the time to host a collaborative movie review session, ranking every movie we've seen this year.",
-    weirder: "The floodwaters part, revealing a treasure map to a hidden stash of butter-flavored topping."
+    event: "One of our team members is feeling overwhelmed by a last-minute change of plans.",
+    solution: "We pause the quest. The movie can wait. We spend the evening just hanging out and talking, prioritizing our team's shared mental health.",
+    weirder: "Our emotional bond becomes so strong that we start to communicate telepathically, eliminating the need for showtimes altogether."
   },
   {
-    event: "The movie's star walks in and decides to live-tweet their own screening, interrupting every five minutes.",
-    solution: "We use this as an opportunity to ask them our most burning questions and get exclusive behind-the-scenes intel.",
-    weirder: "They invite us all to a secret afterparty, which turns out to be a clandestine meeting of the International Popcorn Society."
+    event: "The theater's new 'smart pricing' system charges a different amount for everyone based on their unique cinematic fingerprint.",
+    solution: "We pool our funds, agree to a single price, and challenge the system's lack of transparency, proving that our collective value is greater than its algorithm.",
+    weirder: "The system, recognizing our superior collaboration, offers us a lifetime supply of popcorn and becomes our personal AI movie concierge."
   }
 ];
 
@@ -453,7 +479,7 @@ function updateQuadrantStatus(className, isComplete, progressText) {
 function updateSectionProgress() {
   const movieCount = Object.keys(movieData).length;
   updateQuadrantStatus('known-knowns', movieCount >= totalMovies, `${movieCount}/${totalMovies} movies watched`);
-  updateQuadrantStatus('known-unknowns', currentKnownUnknownsQuestion >= Object.keys(knownUnknownsQuizzes).length, `${currentKnownUnknownsQuestion}/${Object.keys(knownUnknownsQuizzes).length} questions answered`);
+  updateQuadrantStatus('known-unknowns', sectionProgress.knownUnknowns, `All questions answered!`);
   updateQuadrantStatus('unknown-knowns', sectionProgress.unknownKnowns, `Loyalty proven!`);
   updateQuadrantStatus('unknown-unknowns', sectionProgress.unknownUnknowns, `Ready for anything!`);
   saveData();
@@ -523,23 +549,31 @@ window.checkKnownUnknownsAnswer = function(selectedIndex) {
     setTimeout(() => options.forEach(btn => btn.disabled = false), 1000);
   }
 }
+let currentUnknownKnownsQuestion = 0;
 
 window.startRelationalQuiz = function() {
   const container = document.getElementById('relational-quiz-container');
   const quizButton = document.getElementById('relational-quiz-button');
+
+  quizButton.classList.add('hidden');
+  container.classList.remove('hidden');
+
+  currentUnknownKnownsQuestion = 0;
+  loadRelationalQuestion();
+}
+
+function loadRelationalQuestion() {
+  const container = document.getElementById('relational-quiz-container');
+  const quizData = unknownKnownsQuizzes[currentUnknownKnownsQuestion];
   const quizQuestion = container.querySelector('.quiz-question');
   const quizOptions = container.querySelector('.quiz-options');
   const quizFeedback = container.querySelector('.quiz-feedback');
 
-  // Hide the start button and show the quiz
-  quizButton.classList.add('hidden');
-  container.classList.remove('hidden');
-
-  quizQuestion.textContent = unknownKnownsQuiz.question;
-  quizOptions.innerHTML = '';
   quizFeedback.textContent = '';
+  quizQuestion.textContent = quizData.question;
+  quizOptions.innerHTML = '';
 
-  unknownKnownsQuiz.answers.forEach((answer, index) => {
+  quizData.answers.forEach((answer, index) => {
     const button = document.createElement('button');
     button.textContent = answer;
     button.className = 'w-full p-2 text-left rounded-md bg-slate-700 hover:bg-slate-600 transition-colors';
@@ -554,14 +588,22 @@ window.checkRelationalAnswer = function(selectedIndex) {
   const quizFeedback = container.querySelector('.quiz-feedback');
   quizOptions.querySelectorAll('button').forEach(btn => btn.disabled = true);
 
-  if (selectedIndex === unknownKnownsQuiz.correctAnswer) {
-    quizFeedback.textContent = 'Insight Gained: "What are you prepared to do?! - You are a true member of the team!"';
+  const quizData = unknownKnownsQuizzes[currentUnknownKnownsQuestion];
+  
+  if (selectedIndex === quizData.correctAnswer) {
+    quizFeedback.textContent = `Insight Gained! ${quizData.zinger}`;
     quizFeedback.classList.remove('text-red-400');
     quizFeedback.classList.add('text-green-400');
+
+    currentUnknownKnownsQuestion++;
     setTimeout(() => {
-      container.innerHTML = `<p class="text-lg font-bold text-green-400">Your loyalty is proven!</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
-      sectionProgress.unknownKnowns = true;
-      updateSectionProgress();
+      if (currentUnknownKnownsQuestion < unknownKnownsQuizzes.length) {
+        loadRelationalQuestion();
+      } else {
+        container.innerHTML = `<p class="text-lg font-bold text-green-400">Your loyalty is proven! All team lessons learned.</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
+        sectionProgress.unknownKnowns = true;
+        updateSectionProgress();
+      }
     }, 2000);
   } else {
     quizFeedback.textContent = 'Oops! That\'s not it. Trust is earned. Give it another try!';
