@@ -11,7 +11,7 @@
   canvas#starfield { position: fixed; top:0; left:0; z-index:-1; }
   .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(148,163,184,0.1); }
   .quadrant { transition: all 0.6s ease; border-radius:1.5rem; margin-bottom:1rem; cursor: pointer; }
-  .quadrant.expanded { position: relative; transform: scale(1.05); border-top: 8px solid transparent; border-bottom: 8px solid transparent; animation: reelAppear 0.8s forwards; z-index:10; }
+  .quadrant.expanded { position: relative; transform: scale(1.05); border-top: 8px solid transparent; border-bottom: 8px transparent; animation: reelAppear 0.8s forwards; z-index:10; }
   @keyframes reelAppear { 0% { border-image: none; border-top-color: transparent; border-bottom-color: transparent; } 50%,100% { border-image: repeating-linear-gradient(to right,#94a3b8 0 10px,transparent 10px 20px) 20 round; border-top-color:#94a3b8; border-bottom-color:#94a3b8; border-image-slice:100; } }
   .quadrant.expanded::after { content:""; position:absolute; top:0; left:-100%; width:200%; height:100%; background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.1) 50%,transparent 100%); animation: reelShimmer 2s infinite; pointer-events:none; border-radius:inherit; }
   @keyframes reelShimmer { from { left:-100%; } to { left:100%; } }
@@ -22,7 +22,7 @@
   .crisis-btn:hover { background: #dc2626; }
   .fade-in { animation: fadeIn 0.5s ease-in; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity:1; } }
-  .movie-card img { width:100%; height:auto; border-radius:0.75rem; margin-top:0.5rem; }
+  .movie-card img { width: 100%; max-height: 256px; object-fit: cover; border-radius:0.75rem; margin-top:0.5rem; }
   .btn-primary { width:100%; padding:0.5rem 1rem; margin-top:0.5rem; font-weight:600; color:white; background:linear-gradient(135deg, rgb(59,130,246) 0%, rgb(99,102,241) 100%); border:none; border-radius:0.5rem; box-shadow:0 4px 14px 0 rgba(59,130,246,0.3); transition: all 0.3s ease; cursor:pointer; }
   .btn-primary:hover:not(:disabled) { background:linear-gradient(135deg, rgb(37,99,235) 0%, rgb(79,70,229) 100%); transform:translateY(-1px); box-shadow:0 10px 25px rgba(59,130,246,0.4); }
   .btn-primary:disabled { cursor:not-allowed; }
@@ -32,6 +32,9 @@
   .back-btn { background: rgb(51,65,85); color:white; padding:0.5rem 1rem; border-radius:0.5rem; transition: background 0.3s; margin-top:1rem; }
   .back-btn:hover { background: rgb(71,85,105); }
   .screen { display: none; }
+  .quiz-container { display: none; }
+  .quiz-button { background: #10b981; color: white; font-weight: 600; }
+  .quiz-button:hover { background: #059669; }
 </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -76,6 +79,7 @@
           </div>
         </div>
       </div>
+      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
 
     <!-- Quadrant 3: Unknown Knowns -->
@@ -89,6 +93,7 @@
           </div>
         </div>
       </div>
+      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
 
     <!-- Quadrant 4: Unknown Unknowns -->
@@ -102,6 +107,7 @@
           </div>
         </div>
       </div>
+      <p class="mt-4 text-slate-400">This section is a placeholder for future adventures. Stay tuned!</p>
     </div>
   </div>
 
@@ -129,30 +135,96 @@
         </div>
       </div>
       <div class="mt-6 space-y-4">
-        <div class="movie-card" data-movie="Downton Abbey: The Grand Finale">
-          <h3 class="text-white font-bold">Downton Abbey: The Grand Finale</h3>
-          <img src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene">
-          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        <!-- Movies with Trivia -->
+        <div class="movie-card text-center" data-movie="Downton Abbey: The Grand Finale">
+          <div class="h-10 flex items-center justify-center">
+            <h3 class="text-white font-bold">Downton Abbey: The Grand Finale</h3>
+          </div>
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Downton_Abbey_The_Grand_Finale.jpg" alt="Crawley family final scene">
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="https://www.imdb.com/find?q=Downton+Abbey:+The+Grand+Finale" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Downton+Abbey:+The+Grand+Finale" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+          </div>
+          <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
+          <div class="quiz-container space-y-2 mt-4 hidden">
+            <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
+            <div class="quiz-question text-slate-300"></div>
+            <div class="quiz-options flex flex-col space-y-2"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
+          </div>
         </div>
-        <div class="movie-card" data-movie="Anemone">
-          <h3 class="text-white font-bold">Anemone</h3>
-          <img src="Anemone.jpg" alt="Underwater woman with octopus">
-          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        <div class="movie-card text-center" data-movie="Anemone">
+          <div class="h-10 flex items-center justify-center">
+            <h3 class="text-white font-bold">Anemone</h3>
+          </div>
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Anemone.jpg" alt="Underwater woman with octopus">
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="https://www.imdb.com/find?q=Anemone" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Anemone" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+          </div>
+          <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
+          <div class="quiz-container space-y-2 mt-4 hidden">
+            <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
+            <div class="quiz-question text-slate-300"></div>
+            <div class="quiz-options flex flex-col space-y-2"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
+          </div>
         </div>
-        <div class="movie-card" data-movie="Bugonia">
-          <h3 class="text-white font-bold">Bugonia</h3>
-          <img src="Bugonia.jpg" alt="TV producer shocked with glowing insect">
-          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        <div class="movie-card text-center" data-movie="Bugonia">
+          <div class="h-10 flex items-center justify-center">
+            <h3 class="text-white font-bold">Bugonia</h3>
+          </div>
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Bugonia.jpg" alt="TV producer shocked with glowing insect">
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="https://www.imdb.com/find?q=Bugonia" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Bugonia" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+          </div>
+          <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
+          <div class="quiz-container space-y-2 mt-4 hidden">
+            <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
+            <div class="quiz-question text-slate-300"></div>
+            <div class="quiz-options flex flex-col space-y-2"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
+          </div>
         </div>
-        <div class="movie-card" data-movie="Hamnet">
-          <h3 class="text-white font-bold">Hamnet</h3>
-          <img src="Hamnet.jpg" alt="Young boy in 16th century England">
-          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        <div class="movie-card text-center" data-movie="Hamnet">
+          <div class="h-10 flex items-center justify-center">
+            <h3 class="text-white font-bold">Hamnet</h3>
+          </div>
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Hamnet.jpg" alt="Young boy in 16th century England">
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="https://www.imdb.com/find?q=Hamnet" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Hamnet" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+          </div>
+          <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
+          <div class="quiz-container space-y-2 mt-4 hidden">
+            <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
+            <div class="quiz-question text-slate-300"></div>
+            <div class="quiz-options flex flex-col space-y-2"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
+          </div>
         </div>
-        <div class="movie-card" data-movie="Song Sung Blue">
-          <h3 class="text-white font-bold">Song Sung Blue</h3>
-          <img src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage">
-          <button class="btn-primary" onclick="window.trackMovie(this,event)">Mark as Watched</button>
+        <div class="movie-card text-center" data-movie="Song Sung Blue">
+          <div class="h-10 flex items-center justify-center">
+            <h3 class="text-white font-bold">Song Sung Blue</h3>
+          </div>
+          <img class="w-full max-h-48 object-cover shadow-lg" src="Song_Sung_Blue.jpg" alt="Elderly musicians on stage">
+          <div class="flex justify-center space-x-4 mt-2">
+            <a href="https://www.imdb.com/find?q=Song+Sung+Blue" target="_blank" class="text-sm text-slate-400 hover:text-white">IMDb</a>
+            <a href="https://www.rottentomatoes.com/search?q=Song+Sung+Blue" target="_blank" class="text-sm text-slate-400 hover:text-white">🍅 Rotten Tomatoes</a>
+          </div>
+          <button class="btn-primary" onclick="window.showQuiz(this,event)">Start Trivia!</button>
+          <div class="quiz-container space-y-2 mt-4 hidden">
+            <h4 class="text-lg font-bold text-white">Movie Trivia</h4>
+            <div class="quiz-question text-slate-300"></div>
+            <div class="quiz-options flex flex-col space-y-2"></div>
+            <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+            <button class="mark-watched-btn btn-primary hidden" onclick="window.markAsWatched(this,event)">Mark as Watched</button>
+          </div>
         </div>
       </div>
     </div>
@@ -171,23 +243,10 @@
           </div>
         </div>
       </div>
-      <p class="mt-4 mb-4 text-slate-300">These are the gaps in our knowledge that we can fill with a little planning. Let's ask some questions to convert these unknowns into our foundation.</p>
-      <div class="glass-card p-4 rounded-xl space-y-4">
-        <div class="glass-card p-4 rounded-xl border border-slate-700">
-          <p class="text-sm text-slate-300 font-semibold mb-2">Phase 1: Information Overload</p>
-          <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
-            <li>Which movie are we most excited to see first?</li>
-            <li>What if we weren't spending so much time on showtimes and could just focus on popcorn?</li>
-            <li>What's the real cost of our time spent on this decision?</li>
-          </ul>
-        </div>
-        <div class="glass-card p-4 rounded-xl border border-slate-700">
-          <p class="text-sm text-slate-300 font-semibold mb-2">Phase 2: Creative Productivity</p>
-          <ul class="text-slate-400 text-sm list-disc list-inside space-y-1">
-            <li>Are we confident that we're in full control of our movie nights, and not just dependent on a third party's business model?</li>
-            <li>How would it feel to have a data-backed case for our movie night, so we can stop guessing?</li>
-          </ul>
-        </div>
+      <p class="mt-4 mb-4 text-slate-300">Let's solve our shared unknowns with a little introspection!</p>
+      <div class="mt-6 space-y-4" id="known-unknowns-quiz-container">
+        <!-- Quiz will be dynamically inserted here -->
+        <button class="btn-primary" onclick="window.startKnownUnknownsQuiz()">Start the Planning & Research Quiz</button>
       </div>
     </div>
   </div>
@@ -206,9 +265,15 @@
         </div>
       </div>
       <p class="mt-4 mb-4 text-slate-300">Drawing from the wisdom of "The Untouchables," this is about finding power and safety not in individual strength, but in our shared loyalty and trust. Our combined tastes, hunches, and preferences are our hidden wisdom.</p>
-      <div class="glass-card p-4 rounded-xl">
-        <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment"</h4>
-        <p class="text-sm text-slate-400">Just like Eliot Ness found strength in his team, our movie quest is a shared endeavor. It's in the discussions on the car ride home, the shared laughter in the theater, and the agreement on the next movie that we discover our true collaborative power.</p>
+      <div class="glass-card p-4 rounded-xl text-center">
+        <h4 class="font-semibold text-slate-300 mb-2">Our "Relational Holding Environment" Quiz</h4>
+        <p class="text-sm text-slate-400 mb-4">Are you ready to commit to the team?</p>
+        <button id="relational-quiz-button" class="btn-primary" onclick="window.startRelationalQuiz()">Prove Your Loyalty</button>
+        <div class="quiz-container space-y-2 mt-4 hidden" id="relational-quiz-container">
+          <div class="quiz-question text-slate-300"></div>
+          <div class="quiz-options flex flex-col space-y-2"></div>
+          <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -226,12 +291,18 @@
           </div>
         </div>
       </div>
-      <p class="mt-4 mb-4 text-slate-300">These are the unpredictable "black swan" events that could derail our plans. Maybe the movie is sold out, or traffic is a mess. Our resilience is key here.</p>
+      <p class="mt-4 mb-4 text-slate-300">These are the unpredictable "black swan" events that could derail our plans. Our resilience is key here.</p>
       <div class="glass-card p-4 rounded-xl text-center">
         <h4 class="font-semibold text-slate-300 mb-4">Social Entropy Simulator</h4>
-        <p class="text-sm text-slate-400 mb-4">Click to see how our combined resilience handles an unexpected challenge.</p>
-        <button id="crisis-button" class="crisis-btn">Trigger a Scheduling Crisis!</button>
-        <div id="crisis-result" class="mt-4 p-3 rounded-lg text-sm bg-red-900/30 border border-red-800 hidden fade-in"></div>
+        <p class="text-sm text-slate-400 mb-4">Click to simulate an unexpected event and see our shared resilience in action.</p>
+        <button id="start-crisis-button" class="crisis-btn" onclick="window.startCrisisSimulation()">Begin Simulation</button>
+        <div id="crisis-container" class="mt-4 p-3 rounded-lg text-sm hidden fade-in">
+          <div id="crisis-event" class="font-semibold text-red-300 mb-2"></div>
+          <div id="crisis-solution" class="mt-4 pt-3 border-t border-green-800/30">
+            <div class="font-semibold text-green-300 mb-2">Relational Solution:</div>
+            <div id="crisis-solution-text" class="text-green-200 text-left"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -244,9 +315,203 @@ const totalMovies = 5;
 const progressFill = document.getElementById('progress-fill');
 const moviesWatchedSpan = document.getElementById('movies-watched');
 const rewardsStatus = document.getElementById('rewards-status');
-const crisisButton = document.getElementById('crisis-button');
-const crisisResult = document.getElementById('crisis-result');
 const movieCards = document.querySelectorAll('.movie-card');
+
+const movieQuizzes = {
+  "Downton Abbey: The Grand Finale": {
+    question: "What family is at the center of the Downton Abbey series?",
+    answers: ["The Windsors", "The Crawleys", "The Bluths", "The Lannisters"],
+    correctAnswer: 1
+  },
+  "Anemone": {
+    question: "Anemone are often associated with which marine animal?",
+    answers: ["Dolphins", "Sharks", "Clownfish", "Whales"],
+    correctAnswer: 2
+  },
+  "Bugonia": {
+    question: "What does the ancient Greek word 'Bugonia' refer to?",
+    answers: ["The study of insects", "The mythical origin of bees from a bull's carcass", "A rare flower", "A type of ancient pottery"],
+    correctAnswer: 1
+  },
+  "Hamnet": {
+    question: "Who was Hamnet?",
+    answers: ["Shakespeare's twin son", "A famous playwright", "A character from Hamlet", "The name of a popular tavern"],
+    correctAnswer: 0
+  },
+  "Song Sung Blue": {
+    question: "What famous singer had a hit song called 'Song Sung Blue'?",
+    answers: ["Elton John", "Frank Sinatra", "Neil Diamond", "Johnny Cash"],
+    correctAnswer: 2
+  }
+};
+
+const knownUnknownsQuizzes = {
+  "q1": {
+    question: "Which movie are we most excited to see first?",
+    answers: ["The one with the least-sticky floors.", "The one with the pre-approved snack order.", "The one that solves the greatest mystery: who ate the last of the popcorn?", "The one that doesn't require a 3-hour pre-screening discussion."],
+    correctAnswer: 2
+  },
+  "q2": {
+    question: "What if we weren't spending so much time on showtimes and could just focus on popcorn?",
+    answers: ["Our lives would be filled with more butter.", "The kernel-to-pop ratio would finally be optimized.", "We'd become popcorn-centric beings and achieve snack-based enlightenment.", "The movie industry would implode from our sheer focus."],
+    correctAnswer: 2
+  },
+  "q3": {
+    question: "What's the real cost of our time spent on this decision?",
+    answers: ["Approximately 3.7 jumbo sodas.", "The emotional debt of indecision.", "The missed opportunity to be napping instead.", "An invaluable, shared experience that can't be measured in monetary terms... unless you count the gas money."],
+    correctAnswer: 3
+  },
+  "q4": {
+    question: "Are we confident that we're in full control of our movie nights, and not just dependent on a third party's business model?",
+    answers: ["Yes, we have a secret movie-picking algorithm. It's called 'eenie-meenie-miny-moe.'", "No, we are but cogs in the cinematic machine.", "Our control is as solid as a bowl of buttery popcorn.", "The only thing we control is the strategic placement of our nachos."],
+    correctAnswer: 0
+  },
+  "q5": {
+    question: "How would it feel to have a data-backed case for our movie night, so we can stop guessing?",
+    answers: ["It would feel like winning a trivia contest we didn't study for.", "It would feel like the end of all spontaneous joy.", "It would feel like having a magic eight-ball that actually worked.", "We would finally know if 'the one with the guy from that other thing' is a good movie."],
+    correctAnswer: 2
+  }
+};
+let currentKnownUnknownsQuestion = 0;
+
+const unknownKnownsQuiz = {
+  question: "Eliot Ness is looking for his team. He turns to you and asks: 'What are you prepared to do?' What is your answer?",
+  answers: [
+    "I'm prepared to order the largest popcorn bucket and share none of it.",
+    "I'm prepared to handle the ticket queue, but only if you hold my place in the concession line.",
+    "I'm prepared to be the one who makes a promise... and then, when I'm in over my head, I'm prepared to be the one to go to a meeting, and then, at that meeting, make a different promise.",
+    "I'm prepared to make a new plan. I'm prepared to follow it.",
+  ],
+  correctAnswer: 3
+};
+
+const blackSwanEvents = [
+  {
+    event: "The theater's main projector fails, and the film begins to play in reverse.",
+    solution: "We work together to narrate the plot backward, creating a shared avant-garde masterpiece.",
+    weirder: "The projectionist, now our new best friend, reveals the movie's secret alternate ending, which involves a time-traveling koala."
+  },
+  {
+    event: "A flash mob spontaneously bursts into song in the middle of a pivotal scene.",
+    solution: "We join in, harmonizing with the flash mob to improve the soundtrack.",
+    weirder: "The lead dancer reveals they've been sent from the future to warn us about the rising price of popcorn."
+  },
+  {
+    event: "An unexpected rainstorm floods the parking lot, trapping us inside the cinema.",
+    solution: "We use the time to host a collaborative movie review session, ranking every movie we've seen this year.",
+    weirder: "The floodwaters part, revealing a treasure map to a hidden stash of butter-flavored topping."
+  },
+  {
+    event: "The movie's star walks in and decides to live-tweet their own screening, interrupting every five minutes.",
+    solution: "We use this as an opportunity to ask them our most burning questions and get exclusive behind-the-scenes intel.",
+    weirder: "They invite us all to a secret afterparty, which turns out to be a clandestine meeting of the International Popcorn Society."
+  }
+];
+
+window.startKnownUnknownsQuiz = function() {
+  const container = document.getElementById('known-unknowns-quiz-container');
+  container.innerHTML = `
+    <div class="glass-card p-4 rounded-xl space-y-4">
+      <h4 class="text-lg font-bold text-white">The Planning & Research Quiz</h4>
+      <div class="quiz-question text-slate-300"></div>
+      <div class="quiz-options flex flex-col space-y-2"></div>
+      <p class="quiz-feedback text-sm mt-2 font-semibold"></p>
+    </div>
+  `;
+  currentKnownUnknownsQuestion = 0;
+  loadKnownUnknownsQuestion();
+}
+
+function loadKnownUnknownsQuestion() {
+  const container = document.getElementById('known-unknowns-quiz-container');
+  const quizData = Object.values(knownUnknownsQuizzes)[currentKnownUnknownsQuestion];
+  const quizQuestion = container.querySelector('.quiz-question');
+  const quizOptions = container.querySelector('.quiz-options');
+  const quizFeedback = container.querySelector('.quiz-feedback');
+
+  quizFeedback.textContent = '';
+  quizQuestion.textContent = quizData.question;
+  quizOptions.innerHTML = '';
+  
+  quizData.answers.forEach((answer, index) => {
+    const button = document.createElement('button');
+    button.textContent = answer;
+    button.className = 'w-full p-2 text-left rounded-md bg-slate-700 hover:bg-slate-600 transition-colors';
+    button.onclick = () => window.checkKnownUnknownsAnswer(index);
+    quizOptions.appendChild(button);
+  });
+}
+
+window.checkKnownUnknownsAnswer = function(selectedIndex) {
+  const container = document.getElementById('known-unknowns-quiz-container');
+  const quizData = Object.values(knownUnknownsQuizzes)[currentKnownUnknownsQuestion];
+  const quizFeedback = container.querySelector('.quiz-feedback');
+  
+  if (selectedIndex === quizData.correctAnswer) {
+    quizFeedback.textContent = 'Insight Gained!';
+    quizFeedback.classList.remove('text-red-400');
+    quizFeedback.classList.add('text-green-400');
+    container.querySelectorAll('.quiz-options button').forEach(button => button.disabled = true);
+    
+    currentKnownUnknownsQuestion++;
+    setTimeout(() => {
+      if (currentKnownUnknownsQuestion < Object.keys(knownUnknownsQuizzes).length) {
+        loadKnownUnknownsQuestion();
+      } else {
+        container.innerHTML = `<p class="text-lg font-bold text-green-400">All unknowns have been converted! You are ready for the next phase of your quest.</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
+      }
+    }, 1500);
+    
+  } else {
+    quizFeedback.textContent = 'Oops! That's not it. Give it another try!';
+    quizFeedback.classList.remove('text-green-400');
+    quizFeedback.classList.add('text-red-400');
+  }
+}
+
+window.startRelationalQuiz = function() {
+  const container = document.getElementById('relational-quiz-container');
+  const quizButton = document.getElementById('relational-quiz-button');
+  const quizQuestion = container.querySelector('.quiz-question');
+  const quizOptions = container.querySelector('.quiz-options');
+  const quizFeedback = container.querySelector('.quiz-feedback');
+
+  // Hide the start button and show the quiz
+  quizButton.classList.add('hidden');
+  container.classList.remove('hidden');
+
+  quizQuestion.textContent = unknownKnownsQuiz.question;
+  quizOptions.innerHTML = '';
+  quizFeedback.textContent = '';
+
+  unknownKnownsQuiz.answers.forEach((answer, index) => {
+    const button = document.createElement('button');
+    button.textContent = answer;
+    button.className = 'w-full p-2 text-left rounded-md bg-slate-700 hover:bg-slate-600 transition-colors';
+    button.onclick = () => window.checkRelationalAnswer(index);
+    quizOptions.appendChild(button);
+  });
+}
+
+window.checkRelationalAnswer = function(selectedIndex) {
+  const container = document.getElementById('relational-quiz-container');
+  const quizOptions = container.querySelector('.quiz-options');
+  const quizFeedback = container.querySelector('.quiz-feedback');
+  
+  if (selectedIndex === unknownKnownsQuiz.correctAnswer) {
+    quizFeedback.textContent = 'Insight Gained: "What are you prepared to do?! - You are a true member of the team!"';
+    quizFeedback.classList.remove('text-red-400');
+    quizFeedback.classList.add('text-green-400');
+    quizOptions.querySelectorAll('button').forEach(btn => btn.disabled = true);
+    setTimeout(() => {
+      container.innerHTML = `<p class="text-lg font-bold text-green-400">Your loyalty is proven!</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
+    }, 2000);
+  } else {
+    quizFeedback.textContent = 'Oops! That's not it. Trust is earned. Give it another try!';
+    quizFeedback.classList.remove('text-green-400');
+    quizFeedback.classList.add('text-red-400');
+  }
+}
 
 function updateProgress() {
   const count = Object.keys(movieData).length;
@@ -259,19 +524,28 @@ function updateProgress() {
   if(movieCards.length > 0) {
     movieCards.forEach(card => {
       const movie = card.dataset.movie;
-      const button = card.querySelector('button');
-      if(movieData[movie]) { 
-        card.classList.add('watched'); 
-        if(button) { 
-          button.disabled=true; 
-          button.textContent="✓ Watched"; 
-        } 
-      } else { 
-        card.classList.remove('watched'); 
-        if(button) { 
-          button.disabled=false; 
-          button.textContent="Mark as Watched"; 
-        } 
+      const startButton = card.querySelector('.btn-primary');
+      const watchedButton = card.querySelector('.mark-watched-btn');
+      const quizContainer = card.querySelector('.quiz-container');
+
+      if(movieData[movie]) {
+        if(startButton) startButton.style.display = 'none';
+        if(quizContainer) quizContainer.style.display = 'none';
+        if(watchedButton) {
+          watchedButton.textContent = "✓ Watched";
+          watchedButton.disabled = true;
+          watchedButton.classList.remove('hidden');
+        }
+      } else {
+        if(startButton) {
+          startButton.style.display = 'block';
+          startButton.textContent = 'Start Trivia!';
+        }
+        if(quizContainer) quizContainer.style.display = 'none';
+        if(watchedButton) {
+          watchedButton.classList.add('hidden');
+          watchedButton.disabled = false;
+        }
       }
     });
   }
@@ -282,24 +556,75 @@ function updateProgress() {
   }
 }
 
-window.trackMovie = function(button,event){
+window.showQuiz = function(button, event) {
+  event.stopPropagation();
+  const card = button.closest('.movie-card');
+  const quizContainer = card.querySelector('.quiz-container');
+  
+  if (quizContainer) {
+    const movie = card.dataset.movie;
+    const quizData = movieQuizzes[movie];
+    if (quizData) {
+      startQuiz(card, quizData);
+      button.style.display = 'none';
+      quizContainer.style.display = 'block';
+    }
+  }
+}
+
+function startQuiz(card, quizData) {
+  const quizQuestion = card.querySelector('.quiz-question');
+  const quizOptions = card.querySelector('.quiz-options');
+  const quizFeedback = card.querySelector('.quiz-feedback');
+  const watchedBtn = card.querySelector('.mark-watched-btn');
+  
+  quizFeedback.textContent = '';
+  watchedBtn.classList.add('hidden');
+
+  quizQuestion.textContent = quizData.question;
+  quizOptions.innerHTML = ''; // Clear previous options
+  
+  quizData.answers.forEach((answer, index) => {
+    const button = document.createElement('button');
+    button.textContent = answer;
+    button.className = 'w-full p-2 text-left rounded-md bg-slate-700 hover:bg-slate-600 transition-colors';
+    button.onclick = () => window.checkAnswer(card, quizData, index);
+    quizOptions.appendChild(button);
+  });
+}
+
+window.checkAnswer = function(card, quizData, selectedIndex) {
+  const quizFeedback = card.querySelector('.quiz-feedback');
+  const watchedBtn = card.querySelector('.mark-watched-btn');
+
+  if (selectedIndex === quizData.correctAnswer) {
+    quizFeedback.textContent = 'Correct! That's the one!';
+    quizFeedback.classList.remove('text-red-400');
+    quizFeedback.classList.add('text-green-400');
+    watchedBtn.classList.remove('hidden');
+    card.querySelectorAll('.quiz-options button').forEach(button => button.disabled = true);
+  } else {
+    quizFeedback.textContent = 'Oops! That's not it. Give it another try!';
+    quizFeedback.classList.remove('text-green-400');
+    quizFeedback.classList.add('text-red-400');
+  }
+}
+
+window.markAsWatched = function(button, event) {
   event.stopPropagation();
   const card = button.closest('.movie-card');
   const movie = card.dataset.movie;
   if(!movieData[movie]){
-    movieData[movie]=true;
-    localStorage.setItem('movieData',JSON.stringify(movieData));
-    button.style.transform='scale(0.95)';
-    setTimeout(()=>{ button.style.transform=''; updateProgress(); },150);
+    movieData[movie] = true;
+    localStorage.setItem('movieData', JSON.stringify(movieData));
+    updateProgress();
   }
 }
 
 window.showScreen = function(screenId) {
-  // Hide all screens
   document.querySelectorAll('.screen').forEach(screen => {
     screen.style.display = 'none';
   });
-  // Show the requested screen
   const screenToShow = document.getElementById(screenId);
   if (screenToShow) {
     screenToShow.style.display = 'block';
@@ -309,16 +634,47 @@ window.showScreen = function(screenId) {
   }
 }
 
-crisisButton.addEventListener('click',(e)=>{
-  e.stopPropagation();
-  const crises = ["StubHub nightmare: 5 orders, 0 tickets. 6 hours lost.","Traffic jams from parallel universe.","Movie suddenly sold out.","Popcorn machine explodes"];
-  const crisis=crises[Math.floor(Math.random()*crises.length)];
-  crisisResult.innerHTML=`<div class="font-semibold text-red-300 mb-2">CRISIS:</div><div class="text-red-200">${crisis}</div>`;
-  crisisResult.classList.remove('hidden');
-  setTimeout(()=>{
-    crisisResult.innerHTML+=`<div class="mt-4 pt-3 border-t border-green-800/30"><div class="font-semibold text-green-300 mb-2">Relational Solution:</div><div class="text-green-200 text-left">Collaborate and adapt: reschedule, compromise, or grab dinner. Fun is the goal!</div></div>`;
-  },1500);
-});
+window.startCrisisSimulation = function() {
+  const startButton = document.getElementById('start-crisis-button');
+  const crisisContainer = document.getElementById('crisis-container');
+  const crisisEvent = document.getElementById('crisis-event');
+  const crisisSolution = document.getElementById('crisis-solution-text');
+  
+  // Choose a random, unique event
+  const randomIndex = Math.floor(Math.random() * blackSwanEvents.length);
+  const selectedCrisis = blackSwanEvents[randomIndex];
+  
+  // Set the content
+  crisisEvent.textContent = `CRISIS: ${selectedCrisis.event}`;
+  crisisSolution.textContent = selectedCrisis.solution;
+
+  // Show the crisis container
+  startButton.style.display = 'none';
+  crisisContainer.classList.remove('hidden');
+  
+  // Add the "weirder" button
+  const weirderButton = document.createElement('button');
+  weirderButton.className = 'back-btn mt-4';
+  weirderButton.textContent = 'What if it gets weirder?';
+  weirderButton.onclick = () => {
+    crisisEvent.textContent = 'UNIMAGINABLE REALITY:';
+    crisisSolution.textContent = selectedCrisis.weirder;
+    weirderButton.remove();
+  };
+  crisisContainer.appendChild(weirderButton);
+
+  // Add a button to reset the simulation
+  const resetButton = document.createElement('button');
+  resetButton.className = 'back-btn mt-4 ml-2';
+  resetButton.textContent = 'Reset Simulation';
+  resetButton.onclick = () => {
+    crisisContainer.classList.add('hidden');
+    startButton.style.display = 'block';
+    weirderButton.remove();
+    resetButton.remove();
+  };
+  crisisContainer.appendChild(resetButton);
+}
 
 // Starfield
 const canvas = document.getElementById('starfield');
