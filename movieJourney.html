@@ -53,7 +53,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
     <!-- Quadrant 1: Known Knowns -->
-    <div class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this)">
+    <div id="quadrant-1" class="quadrant known-knowns glass-card p-6 shadow-xl border border-slate-700">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎬</span>
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Quadrant 2: Known Unknowns -->
-    <div class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this)">
+    <div id="quadrant-2" class="quadrant known-unknowns glass-card p-6 shadow-xl border border-slate-700">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">📝</span>
@@ -140,7 +140,7 @@
     </div>
 
     <!-- Quadrant 3: Unknown Knowns -->
-    <div class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this)">
+    <div id="quadrant-3" class="quadrant unknown-knowns glass-card p-6 shadow-xl border border-slate-700">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🤝</span>
@@ -161,7 +161,7 @@
     </div>
 
     <!-- Quadrant 4: Unknown Unknowns -->
-    <div class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700" onclick="window.toggleDetails(this)">
+    <div id="quadrant-4" class="quadrant unknown-unknowns glass-card p-6 shadow-xl border border-slate-700">
       <div class="quadrant-header flex justify-between items-center">
         <div class="quadrant-title-group flex items-center space-x-3">
           <span class="quadrant-icon text-2xl">🎲</span>
@@ -244,6 +244,26 @@ crisisButton.addEventListener('click',(e)=>{
   },1500);
 });
 
+// New event listeners to fix the mobile scroll issue
+let touchStartY = 0;
+const quadrants = document.querySelectorAll('.quadrant');
+quadrants.forEach(quadrant => {
+    quadrant.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    });
+
+    quadrant.addEventListener('touchend', (e) => {
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaY = Math.abs(touchStartY - touchEndY);
+        
+        // Only trigger toggleDetails if the movement was minimal (a tap, not a scroll)
+        if (deltaY < 5) { // 5 pixel threshold
+            window.toggleDetails(quadrant);
+        }
+    });
+});
+
+
 // Starfield
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
@@ -255,7 +275,7 @@ window.addEventListener('resize',resize); resize(); animate();
 window.onload=function(){
   document.getElementById('movie-theme-song').src=audioUrl;
   updateProgress();
-  window.toggleDetails(document.querySelector('.known-knowns'));
+  window.toggleDetails(document.getElementById('quadrant-1'));
 }
 </script>
 </body>
