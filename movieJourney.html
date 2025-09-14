@@ -463,7 +463,7 @@ window.checkKnownUnknownsAnswer = function(selectedIndex) {
     }, 1500);
     
   } else {
-    quizFeedback.textContent = 'Oops! That's not it. Give it another try!';
+    quizFeedback.textContent = 'Oops! That\'s not it. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
   }
@@ -507,7 +507,7 @@ window.checkRelationalAnswer = function(selectedIndex) {
       container.innerHTML = `<p class="text-lg font-bold text-green-400">Your loyalty is proven!</p><button class="btn-primary mt-4" onclick="window.showScreen('main-screen')">Return to Main Quest</button>`;
     }, 2000);
   } else {
-    quizFeedback.textContent = 'Oops! That's not it. Trust is earned. Give it another try!';
+    quizFeedback.textContent = 'Oops! That\'s not it. Trust is earned. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
   }
@@ -598,13 +598,13 @@ window.checkAnswer = function(card, quizData, selectedIndex) {
   const watchedBtn = card.querySelector('.mark-watched-btn');
 
   if (selectedIndex === quizData.correctAnswer) {
-    quizFeedback.textContent = 'Correct! That's the one!';
+    quizFeedback.textContent = 'Correct! That\'s the one!';
     quizFeedback.classList.remove('text-red-400');
     quizFeedback.classList.add('text-green-400');
     watchedBtn.classList.remove('hidden');
     card.querySelectorAll('.quiz-options button').forEach(button => button.disabled = true);
   } else {
-    quizFeedback.textContent = 'Oops! That's not it. Give it another try!';
+    quizFeedback.textContent = 'Oops! That\'s not it. Give it another try!';
     quizFeedback.classList.remove('text-green-400');
     quizFeedback.classList.add('text-red-400');
   }
